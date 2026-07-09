@@ -1,0 +1,651 @@
+Before <a href="https://wordpress.com/blog/wordpress-7-0/">WordPress 7.0</a>, <a href="https://wordpress.com/blog/wordpress-ai-plugins/">plugins adding AI features</a> had to request and manage an API key to communicate with an AI provider.
+
+This came with several drawbacks in terms of code weight and maintainability. You had to bundle heavy, proprietary SDK libraries into your plugins and write provider-specific cURL requests.
+
+This fragmented scenario has completely changed with the native <a href="https://wordpress.com/blog/wordpress-7-0/#integration-with-ai">AI integration introduced in WordPress 7.0</a>. Today, WordPress features a centralized interface for configuring credentials for various AI providers, along with a new PHP API. This new architecture allows you to send commands, instructions, media files, and data structures seamlessly, while the Core handles the requests.
+
+The new architecture offers substantial benefits for both site admins and plugin developers.
+
+Admins no longer need to configure AI settings across multiple plugins. Starting with WordPress 7.0, you simply install and enable your plugin connectors, enter your API keys into the unified Connectors interface, and they become instantly available to all AI-powered plugins on your site. You can easily monitor AI usage, switch your preferred model, or revoke a provider's access for all plugins with a single click.
+
+For plugin developers, the advantages are even greater, ranging from data security to code portability and a drastic reduction in <a href="https://wordpress.com/blog/scalable-wordpress-agencies/#technical-debt">technical debt</a>.
+
+Ready to start this journey into the new WordPress AI architecture? Let’s dive in.
+[toc]
+<h2>The three layers of the WordPress AI architecture</h2>
+Today, your WordPress sites are natively AI-ready. This is not about out-of-the-box AI features, though, but rather the foundation for building AI-powered websites.
+
+The new architecture is structured across three distinct layers:
+[sub-toc count-number="3"]
+<h3>AI Connector</h3>
+Before <a href="https://wordpress.com/blog/wordpress-7-0/">WordPress 7.0</a>, every plugin that added AI features to your site needed its own system to store and manage your API keys. Your credentials had to be hardcoded into the plugin or managed via a custom settings page. In either case, it was far from an ideal solution for handling sensitive data.
+
+[caption id="attachment_211404" align="alignnone" width="1462"]<img src="https://wordpress.com/wp-content/uploads/2026/06/connectors-screen.png" alt="Connectors screen" width="1462" height="1404" class="size-full wp-image-211404" /> The centralized AI Connectors interface in the WordPress admin dashboard.[/caption]
+
+A unified interface lets you configure all your AI service providers in one central location. This interface brings several major benefits to site management.
+
+From a management and security standpoint, the biggest advantage is that you only need to set up your providers once in the Connectors interface, and you can then forget about them, regardless of how many plugins use them. If you ever need to change your API keys, you won't have to reconfigure every plugin; you can update them all at once in the Connectors screen.
+
+Centralizing credentials also improves your site's security by mitigating the risk of exposing sensitive data through third-party plugins that might be poorly coded or untrustworthy.
+
+Another key advantage is code portability. Your plugins no longer need to know who your AI provider is because the new architecture decouples authentication from plugin logic. This means that if you switch AI providers, your plugin will keep working without requiring a single line of code change.
+
+However, the real breakthrough in portability is the ability for site admins to configure multiple connectors simultaneously. When a plugin triggers a request, WordPress automatically selects the most suitable AI Provider and model to generate the response, based on both the specific <a href="https://make.wordpress.org/core/2026/03/24/introducing-the-ai-client-in-wordpress-7-0/#ai-model-preferences" target="_blank" rel="noopener noreferrer">configuration of the plugin</a> and the capabilities of the available models.
+
+<h3>AI Client</h3>
+While the Connectors screen provides the configuration UI for AI Providers, the <a href="https://make.wordpress.org/core/2026/03/24/introducing-the-ai-client-in-wordpress-7-0/" target="_blank" rel="noopener noreferrer">AI Client</a> gives developers the operational tool to communicate with AI models. 
+
+It is a native software interface that standardizes interaction with artificial intelligence models through the global <code>wp_ai_client_prompt()</code> function and a unified set of PHP methods.
+
+<h4>Reduced technical debt</h4>
+For developers, a major advantage of the new AI architecture is the reduction of technical debt and dependencies. Before WordPress 7.0, adding AI features came at a very high cost in terms of code maintenance. You had to bundle third-party proprietary SDKs (such as the official libraries for <a href="https://developers.openai.com/api/docs/libraries" target="_blank" rel="noopener noreferrer">OpenAI</a> or <a href="https://platform.claude.com/docs/en/api/client-sdks" target="_blank" rel="noopener noreferrer">Anthropic</a>) and constantly monitor library versions. This resulted in a heavy plugin codebase and opened the door to compatibility errors. 
+
+Furthermore, you had to write many lines of code to handle network logic and response parsing. To make things even worse, the code was vendor-specific, so if you decided to switch AI providers, you would have to rewrite your plugin's entire network architecture.
+
+The AI Client solves this problem at its root by transferring all this heavy work to the WordPress core. Your code becomes completely agnostic to the AI provider; you only need to write your instructions once, and WordPress will translate them into the model's specific "dialect".
+
+<h4>Intelligent model selection</h4>
+A powerful feature of the AI Client's Fluent Interface is the ability to set preferred models through the <code>using_model_preference()</code> method, available via the <code>wp_ai_client_prompt()</code> builder function. This method lets you declare an ordered list of models for your plugin's specific task. For example, the following code requests text generation targeting 3 preferred models:
+
+<pre><code class="language-php">$text_result = wp_ai_client_prompt( 'Convert the following transcript into a concise, blog-ready draft.' )
+	-&gt;using_model_preference(
+		'gemini-2.5-flash',
+		'claude-3-5-sonnet',
+		'gpt-4o'
+	)
+	-&gt;generate_text();</code></pre>
+
+WordPress will check the providers configured on the Connectors screen and scan the list of models defined in the plugin's code, selecting the first connector that is also available on the site. If none of the models specified in your code are available among the active Connectors, WordPress will ignore the model preference list and fall back to the first compatible model configured on the site.
+
+This mechanism ensures that your plugin will always work, even if the site admin switches to a different AI provider.
+
+<h3>AI Provider</h3>
+An AI Provider is the company that owns, trains, and hosts the Large Language Models (LLMs) we use every day. OpenAI, Google Gemini, and Anthropic are the most common AI providers supported via dedicated connectors in WordPress 7.0, but developers can register additional custom AI Providers.
+
+When your plugin's code calls the <code>generate_text()</code> method — or any other generation method — WordPress compiles and sends a data payload to the AI Provider via the endpoint established by the Connector. Here is the sequence of operations that takes place behind the scenes:
+<ul>
+	<li>As a first step, the AI Provider receives the input prompt text along with any attached multimedia files (data payload).</li>
+	<li>Once received, it processes the request, applying any system instructions.</li>
+	<li>From there, it generates the output structured as free text or a JSON object.</li>
+	<li>Finally, it sends the output back to WordPress via an HTTP response.</li>
+</ul>
+Every provider offers a wide variety of models with different capabilities, speeds, and prices. These range from models specialized purely in text processing to multimodal models that accept media files (audio, images, video) alongside a text prompt, to models engineered for specific tasks, such as image generation or speech-to-text conversion.
+
+[caption id="attachment_211411" align="alignnone" width="1718"]<img src="https://wordpress.com/wp-content/uploads/2026/06/gemini-3-models.png" alt="Gemini 3 models" width="1718" height="1534" class="size-full wp-image-211411" /> Google's Gemini 3 model family.[/caption]
+
+Again, the models available to a WordPress site depend on the AI providers the user configures in the Connectors screen. This means your plugin does not dictate which specific provider to use.
+
+<h2>A deep dive into the wp_ai_client_prompt() function</h2>
+The <code>wp_ai_client_prompt()</code> function enables plugins to communicate with AI models in a standardized way: you won’t install external libraries, handle provider-specific configurations, or hard-code manual HTTP requests.
+
+It’s a software interface that lets you write your code once, leaving WordPress to handle the heavy lifting and translating your instructions into each model's specific "dialect".
+
+The function returns an instance of the <a href="https://developer.wordpress.org/reference/classes/wp_ai_client_prompt_builder/" target="_blank" rel="noopener noreferrer"><code>WP_AI_Client_Prompt_Builder</code> class</a>, which provides a fluent interface of chainable methods to customize your prompts. The function is <a href="https://core.trac.wordpress.org/browser/tags/7.0/src/wp-includes/ai-client/class-wp-ai-client-prompt-builder.php#L33" target="_blank" rel="noopener noreferrer">described as follows</a>:
+
+<pre><code class="language-php">/**
+ * Fluent builder for constructing AI prompts, returning WP_Error on failure.
+ *
+ * This class provides a fluent interface for building prompts with various
+ * content types and model configurations. It wraps the PHP AI Client SDK's
+ * PromptBuilder and adds WordPress-specific behavior including WP_Error
+ * handling instead of exceptions, snake_case method naming, and integration
+ * with the Abilities API.
+ *
+ * Only the generating methods will return a WP_Error, to not break the fluent
+ * interface. As soon as any exception is caught in a chain of method calls,
+ * the returned instance will be in an error state, and all subsequent method
+ * calls will be no-ops that just return the same error state instance. Only
+ * when a generating method is called, the WP_Error will be returned.
+ */</code></pre>
+
+<code>wp_ai_client_prompt()</code> does not make an immediate HTTP request; instead, it instantiates and returns a <code>WP_AI_Client_Prompt_Builder</code> object. More than 50 configuration methods populate the object's private properties using a <a href="https://en.wikipedia.org/wiki/Fluent_interface" target="_blank" rel="noopener noreferrer">Fluent Interface</a>, which makes the code highly readable and easy to write.
+
+Here is a non-exhaustive list of methods you will use most frequently:
+<ul>
+	<li><code>with_text()</code>: Adds text to the current message.</li>
+	<li><code>with_file()</code>: Adds a file to the current message.</li>
+	<li><code>with_history()</code>: Adds conversation history messages.</li>
+	<li><code>using_model_preference()</code>: Sets preferred models to evaluate in order.</li>
+	<li><code>using_system_instruction()</code>: Sets the system instruction.</li>
+	<li><code>using_max_tokens()</code>: Sets the maximum number of tokens to generate.</li>
+	<li><code>using_temperature()</code>: Sets the temperature for generation.</li>
+	<li><code>using_top_p()</code>: Sets the top-p value for generation.</li>
+	<li><code>using_top_k()</code>: Sets the top-k value for generation.</li>
+	<li><code>as_output_file_type()</code>: Sets the output file type.</li>
+	<li><code>as_json_response()</code>: Configures the prompt for JSON response output.</li>
+	<li><code>is_supported_for_text_generation()</code>: Checks if text generation is supported by the active configuration.</li>
+	<li><code>is_supported_for_image_generation()</code>: Checks if image generation is supported by the active configuration.</li>
+	<li><code>is_supported_for_text_to_speech_conversion()</code>: Checks if text-to-speech conversion is supported by the active configuration.</li>
+	<li><code>is_supported_for_video_generation()</code>: Checks if video generation is supported by the active configuration.</li>
+	<li><code>generate_text()</code>: Generates a text result from the prompt.</li>
+	<li><code>generate_image()</code>: Generates an image from the prompt.</li>
+	<li><code>convert_text_to_speech()</code>: Converts text to speech.</li>
+	<li><code>generate_speech()</code>: Generates speech from the prompt.</li>
+	<li><code>generate_video()</code>: Generates a video from the prompt.</li>
+</ul>
+
+For the complete list of methods, please refer to the <a href="https://github.com/WordPress/wordpress-develop/blob/7.0/src/wp-includes/ai-client/class-wp-ai-client-prompt-builder.php#L33" target="_blank" rel="noopener noreferrer">WordPress core source code</a>.
+
+Suppose you want to accurately transcribe the contents of an audio file. You could use the function as follows:
+
+<pre><code class="language-php">$transcription_builder = wp_ai_client_prompt( $prompt )
+	-&gt;with_file( $audio_base64, $mime_type )
+	-&gt;using_temperature( 0.1 );
+
+if ( ! $transcription_builder-&gt;is_supported_for_text_generation() ) {
+	// No configured provider supports the current prompt configuration.
+	return new \WP_Error(
+		'no_supported_model',
+		'No configured AI model can process this request. Configure a provider in Settings &gt; Connectors.',
+		array( 'status' =&gt; 400 )
+	);
+}
+
+$transcript = $transcription_builder-&gt;generate_text();</code></pre>
+
+Here is what this code does:
+<ul>
+	<li><code>$prompt</code>: Represents the primary string containing your core instructions.</li>
+	<li><code>with_file()</code>: Unlocks the multimodal capabilities of the interface. In the example above, we passed the pre-encoded audio binary payload as a Base64-Encoded string along with its corresponding MIME type.</li>
+	<li><code>using_temperature()</code>: Controls the determinism of the response. While a low value (0.1) forces the model to remain faithful to the audio, a higher value allows greater creative freedom. You can combine this method with the <code>using_top_p()</code> (Top-Probability) method for tighter control over the output.</li>
+	<li><code>is_supported_for_text_generation()</code>: Checks if the active connectors support the requirements of the current prompt before committing resources to a network call.</li>
+	<li><code>generate_text()</code>: This is the terminating method of the Fluent Interface. It sends the unified HTTP request to the active provider and returns either the generated text string or a <code>WP_Error</code> object on failure.</li>
+</ul>
+
+In short, we passed the AI Provider a text prompt and an attached audio file. We set a low temperature to ensure the most deterministic result possible, verified that the active configuration supported text generation, and finally executed the speech-to-text transcription based on the AI's response.
+
+With another prompt, we can pass the raw transcript back to the AI to generate a response structured as a JSON object:
+
+<pre><code class="language-php">$structured_json = wp_ai_client_prompt(
+	"Convert the following transcript into a concise, blog-ready draft in American English.\n" .
+	"Return JSON with a post title and body sections.\n" .
+	"Each section must have: heading, level (2 or 3), and paragraphs (array).\n" .
+	"If useful, include bullet_points (array) for short actionable lists.\n" .
+	"Use short, clear headings and readable paragraph text.\n\n" .
+	"Transcript:\n" . $transcript
+)
+	-&gt;using_system_instruction( "You are a professional WordPress content editor. Always write in American English (use appropriate spelling, grammar, and conventions for that language variant)." )
+	-&gt;using_temperature( 0.4 )
+	-&gt;as_json_response( $schema )
+	-&gt;generate_text();</code></pre>
+
+For this second prompt, we use additional methods to leverage other capabilities of the API:
+<ul>
+	<li><code>using_system_instruction()</code>: Defines the operational context and behavioral role of the model, cleanly separating its persona ("a professional WordPress content editor") from the data payload.</li>
+	<li><code>using_temperature( 0.4 )</code>: Sets a higher temperature than the previous transcription task, allowing the model to use a richer vocabulary and produce a more fluid content.</li>
+	<li><code>as_json_response()</code>: Forces the model to return a structured JSON string that matches the layout defined in your <code>$schema</code> variable. This is useful when preparing content for Gutenberg.</li>
+</ul>
+With an output structured as JSON, you can extract individual fields and programmatically map them into native Gutenberg blocks using core WordPress functions.
+
+For a deeper overview of the AI Client, see also the <a href="https://make.wordpress.org/core/2026/03/24/introducing-the-ai-client-in-wordpress-7-0/" target="_blank" rel="noopener noreferrer">Introducing the AI Client in WordPress 7.0</a> dev note.
+
+<h2>Convert an audio file into Gutenberg-ready content with AI</h2>
+Now that you have a better understanding of the three layers of the WordPress AI architecture, let's look at how it all comes together with a real-world example. In this section, you will learn how to build the core logic of an AI-powered plugin designed to generate a well-crafted post draft directly from an audio file.
+
+The use cases for this feature are vast and diverse. Imagine creating a comprehensive blog post from a quick voice note sent via your favorite messaging app, or transcribing an audio interview recorded on your smartphone.
+
+To implement this functionality on your WordPress site, you will need to build a custom plugin. We won't cover the boilerplate files or the full plugin registration process here; for the basics of plugin development, you can refer to <a href="https://wordpress.com/blog/gutenberg-plugin/">other tutorials</a> on the WordPress blog or the <a href="https://make.wordpress.org/cli/handbook/how-to/how-to-create-custom-plugins/" target="_blank" rel="noopener noreferrer">official WordPress.org documentation</a>.
+
+We will focus on the core logic that allows your plugin to communicate with your AI Provider. But don't worry, the plugin is available for you to browse and download in <a href="https://github.com/carlodaniele/ai-content-builder" target="_blank" rel="noopener noreferrer">this GitHub repository</a>.
+
+[notice type="info"]The example plugin of this tutorial has been built on WordPress 7.0. It will not work on older versions of the CMS.[/notice]
+
+<h3>What this plugin does</h3>
+To get started, navigate to the <a href="https://github.com/carlodaniele/ai-content-builder" target="_blank" rel="noopener noreferrer">GitHub project page</a> and download the plugin's ZIP archive. Next, log into your WordPress 7.0+ dashboard and upload it from <strong>Plugins</strong> &gt; <strong>Add Plugin</strong> &gt; <strong>Upload Plugin</strong>. Once the plugin is installed and activated, you are ready to follow along with this tutorial.
+
+The <strong>AI Content Builder</strong> plugin generates a custom settings sidebar, accessible via an icon located in the top-right corner of the Block Editor interface. This sidebar features a dedicated interface for uploading audio files and a toggle that lets the AI overwrite the current post title.
+
+[caption id="attachment_211625" align="alignnone" width="1612"]<img src="https://wordpress.com/wp-content/uploads/2026/06/ai-content-builder-sidebar.png" alt="The AI Content Builder sidebar" width="1612" height="1054" class="size-full wp-image-211625" /> The AI Content Builder plugin adds a custom settings sidebar to the Block Editor.[/caption]
+
+The <strong>Upload audio note</strong> button opens the WordPress media uploader, letting you upload a new audio file or select an existing one from your media library.
+
+[caption id="attachment_211626" align="alignnone" width="1560"]<img src="https://wordpress.com/wp-content/uploads/2026/06/select-or-upload-media.png" alt="The WordPress media library" width="1560" height="1328" class="size-full wp-image-211626" /> Select or upload audio files in the WordPress media library.[/caption]
+
+With the audio file loaded, the <strong>Generate Content</strong> button triggers an asynchronous request to your active AI Provider.
+
+[caption id="attachment_211627" align="alignnone" width="1616"]<img src="https://wordpress.com/wp-content/uploads/2026/06/generate-content-button.png" alt="The plugin sidebar" width="1616" height="1062" class="size-full wp-image-211627" /> The plugin sidebar with the active Generate Content button.[/caption]
+
+The image below shows the final post draft generated by the AI in just a few seconds.
+
+[caption id="attachment_211628" align="alignnone" width="1612"]<img src="https://wordpress.com/wp-content/uploads/2026/06/ai-generated-post-content.png" alt="AI-generated markup" width="1612" height="1336" class="size-full wp-image-211628" /> A well-formatted blog post draft AI-generated from a raw audio file.[/caption]
+
+The resulting content is structured into native Gutenberg blocks, including paragraphs, headings, and lists.
+
+[caption id="attachment_211629" align="alignnone" width="1616"]<img src="https://wordpress.com/wp-content/uploads/2026/06/post-content-in-code-editor.png" alt="Well-structured markup in the Code editor." width="1616" height="1396" class="size-full wp-image-211629" /> Well-structured markup in the WordPress Code Editor.[/caption]
+
+Now let's dive into the plugin's logic.
+
+[notice type="important"]This plugin was created specifically for this tutorial and is intended for illustrative purposes only. Don't use it in production.[/notice]
+
+<h3>What you need for this plugin</h3>
+Here are the basic requirements for building a WordPress plugin that hooks into the new AI architecture to generate your post content:
+<ul>
+	<li>WordPress 7.0+</li>
+	<li>An API key for an AI provider that offers a model capable of speech-to-text conversion. In our example, we'll be using Google AI.</li>
+	<li>Your favorite IDE. For this plugin, we used VS Code.</li>
+	<li>A solid understanding of WordPress and Gutenberg development, REST APIs, PHP, and JavaScript.</li>
+</ul>
+You don't need to worry about Node.js, build processes, or importing external libraries because this plugin relies entirely on native WordPress core APIs. The result is a lightweight, secure plugin with zero technical debt.
+
+[notice type="info"]Due to space constraints, the following sections will focus solely on the code governing communication with the AI Client and handling AI-generated content. The rest of the code is fully documented in the <a href="https://github.com/carlodaniele/ai-content-builder/tree/35ef318c10768969e235c89617a59cc4b6b38eb4" target="_blank" rel="noopener noreferrer">GitHub repository</a>.[/notice]
+<h3>Plugin structure and WordPress minimum version</h3>
+The AI Content Builder plugin consists of just two files:
+<ul>
+	<li><code>ai-content-builder.php</code></li>
+	<li><code>editor.js.</code></li>
+</ul>
+The minimum required WordPress version is 7.0, so make sure you set it in the plugin's header:
+
+<pre><code class="language-php">&lt;?php
+/**
+ * Plugin Name: AI Content Builder
+ * Description: Gutenberg sidebar plugin that uploads audio and generates post content using the WordPress 7.0 AI Client.
+ * Version: 1.0.0
+ * Requires at least: 7.0
+ * Requires PHP: 8.0
+ * Author: Your Name
+ * License: GPL-2.0-or-later
+ * Text Domain: ai-content-builder
+ */</code></pre>
+
+With that in mind, let's take a look at the process of building an AI-powered plugin for WordPress.
+
+<h3>The plugin's data flow</h3>
+Before we dive into the code, let’s take a look at how data flows from the WordPress backend (the block editor) through to the PHP server and the AI provider, and then back again.
+
+<a href="#register-api-endpoint">1. Frontend to backend: Asynchronous REST call</a>: the browser sends the audio ID to the plugin’s custom REST endpoint. To prevent the UI from freezing, we register a REST endpoint that allows asynchronous requests to the PHP server.
+
+<a href="#first-ai-pass">2. First AI pass: Speech-to-text transcription</a>: the server intercepts the request, retrieves the audio from the database, and queries the AI client to extract the raw text transcription.
+
+<a href="#second-ai-pass">3. Second AI pass: Content structuring</a>: The server sends the raw transcription back to the AI client and requests that it be formatted as a structured JSON object.
+
+<a href="#block-generation">4. Data hydration and block generation</a>: the JavaScript (JS) script receives the structured JSON object, normalizes it, and maps the fields to native Gutenberg blocks.
+
+Now let's look at the logic behind each phase.
+
+<h3 id="register-api-endpoint">1. Register a custom API endpoint</h3>
+The first step in creating the <strong>AI Content Builder</strong> plugin is to register an API endpoint. This is essential because processing an audio file and generating a response can take several seconds (or even minutes) for the AI model. <strong>Registering a REST endpoint enables you to make asynchronous requests via the sidebar controls, preventing the UI from freezing.</strong>
+
+Registering an API endpoint also enables you to make secure AI calls without exposing login credentials by leveraging the WordPress native authentication system. 
+
+The logic for registering and initializing the endpoint is handled in the plugin's PHP file using the two class methods, <code>init()</code> and <code>register_rest_routes()</code>.
+
+<pre><code class="language-php">public static function init(): void {
+
+	// Register the custom REST endpoint used by the sidebar JS.
+	add_action( 'rest_api_init', array( __CLASS__, 'register_rest_routes' ) );
+
+	...
+}</code></pre>
+
+By hooking the function call into the <code>rest_api_init</code> hook, the plugin only registers the endpoint root when a REST API request is triggered. This improves performance by preventing unnecessary delays in page loading.
+
+You can configure routes using the <code>register_rest_routes()</code> method as shown in the code below:
+
+<pre><code class="language-php">public static function register_rest_routes(): void {
+	register_rest_route(
+		self::REST_NAMESPACE,
+		self::REST_ROUTE,
+		array(
+			'methods'             =&gt; \WP_REST_Server::CREATABLE, // Alias for POST.
+			'callback'            =&gt; array( __CLASS__, 'handle_generate_request' ),
+			'permission_callback' =&gt; static function (): bool {
+				// Reject unauthenticated or insufficiently privileged requests early.
+				return current_user_can( 'edit_posts' );
+			},
+			'args'                =&gt; array(
+				'audio_id' =&gt; array(
+					'type'     =&gt; 'integer',
+					'required' =&gt; true,
+				),
+			),
+		)
+	);
+}</code></pre>
+
+This method does the following:
+
+<ul>
+	<li>The <a href="https://developer.wordpress.org/reference/functions/register_rest_route/" target="_blank" rel="noopener noreferrer"><code>register_rest_route()</code> function</a> takes three parameters: the route namespace, the route itself, and a configuration array.</li>
+	<li><code>WP_REST_Server::CREATABLE</code> is an alias for the POST transport method, which is used to ensure maximum compatibility with the internal architecture of WordPress.</li>
+	<li><code>permission_callback</code> is an anonymous function that restricts access to authenticated users who have permission to create and edit their own posts. WordPress then blocks the request before processing it and automatically returns a <a href="https://wordpress.com/blog/401-error/">401 Unauthorized</a> or <a href="https://wordpress.com/blog/403-forbidden-error/">403 Forbidden</a> error in case of unauthorized access.</li>
+	<li><code>args</code> is an optional array of additional parameters that can be used to modify the API response. It allows you to specify the data that the request to the endpoint must return.</li>
+	<li><code>audio_id</code> is an array of parameters that specifies the type of data that is required. If the returned data type is not an integer or is missing, the REST API stops execution and throws an error.</li>
+</ul>
+[notice type="info"]Please refer to the official documentation for additional information on <a href="https://developer.wordpress.org/rest-api/extending-the-rest-api/routes-and-endpoints/" target="_blank" rel="noopener noreferrer">routes and endpoints</a>.[/notice]
+
+Finally, ensure the editor sidebar knows where to send the data. To do this, you use the <code>wp_localize_script()</code> function within the <code>enqueue_editor_assets()</code> method.
+
+<pre><code class="language-php">public static function enqueue_editor_assets(): void {
+	...
+
+	wp_localize_script(
+		'ai-content-builder-editor',
+		'AICBData',
+		array(
+			'restPath' =&gt; '/' . self::REST_NAMESPACE . self::REST_ROUTE,
+			'nonce'    =&gt; wp_create_nonce( 'wp_rest' ),
+		)
+	);
+}</code></pre>
+<ul>
+	<li>The <a href="https://developer.wordpress.org/reference/functions/wp_localize_script/" target="_blank" rel="noopener noreferrer"><code>wp_localize_script()</code> function</a> is primarily used to localize a registered script with data for a JavaScript variable, but here we use it to pass data from PHP to JavaScript via the global <code>AICBData</code> object.</li>
+	<li><code>restPath</code> is the endpoint address; specifying it here allows you to avoid hardcoding it in the JavaScript file.</li>
+	<li><code>nonce</code> sets a security token to <a href="https://developer.wordpress.org/reference/functions/wp_create_nonce/" target="_blank" rel="noopener noreferrer">prevent unauthorized access</a>.</li>
+</ul>
+<h3 id="first-ai-pass">2. Accessing the AI Client to extract text from an audio file</h3>
+The core of our plugin is the <code>handle_generate_request()</code> method. This method performs a sequence of tasks, beginning with security checks and concluding with the generation of post content to be injected into the block editor.
+
+First, it verifies that the AI Client is available and that AI support has not been disabled on the site.
+
+<pre><code class="language-php">public static function handle_generate_request( \WP_REST_Request $request ) {
+	if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
+		return new \WP_Error(
+			'ai_client_unavailable',
+			'WordPress AI Client is not available. This plugin requires WordPress 7.0+.',
+			array( 'status' =&gt; 500 )
+		);
+	}
+
+	if ( function_exists( 'wp_supports_ai' ) &amp;&amp; ! wp_supports_ai() ) {
+		return new \WP_Error(
+			'ai_disabled',
+			'AI support is disabled on this site.',
+			array( 'status' =&gt; 403 )
+		);
+	}
+	...
+}</code></pre>
+
+In the event of a failure, the checks return a 500 or 403 error, respectively.
+
+The next code block performs the following actions:
+<ul>
+	<li>Extracts the audio file ID from the request</li>
+	<li>Ensures that the audio file ID is a positive integer</li>
+	<li>Checks the file type</li>
+	<li>Retrieves the MIME type</li>
+	<li>Extracts and encodes the file content in Base64</li>
+</ul>
+
+<pre><code class="language-php">$audio_id = absint( $request-&gt;get_param( 'audio_id' ) );
+if ( ! $audio_id ) {
+	return new \WP_Error( 'invalid_audio_id', 'Invalid audio ID.', array( 'status' =&gt; 400 ) );
+}
+
+$attachment = get_post( $audio_id );
+if ( ! $attachment || 'attachment' !== $attachment-&gt;post_type ) {
+	return new \WP_Error( 'audio_not_found', 'Audio attachment not found.', array( 'status' =&gt; 404 ) );
+}
+
+$mime_type = (string) get_post_mime_type( $audio_id );
+if ( 0 !== strpos( $mime_type, 'audio/' ) ) {
+	return new \WP_Error( 'invalid_audio_type', 'Attachment must be an audio file.', array( 'status' =&gt; 400 ) );
+}
+
+$audio_path = get_attached_file( $audio_id );
+if ( ! $audio_path || ! file_exists( $audio_path ) ) {
+	return new \WP_Error( 'audio_path_missing', 'Audio file path not found on server.', array( 'status' =&gt; 404 ) );
+}
+
+$audio_bytes = file_get_contents( $audio_path );
+if ( false === $audio_bytes ) {
+	return new \WP_Error( 'audio_read_failed', 'Unable to read audio file.', array( 'status' =&gt; 500 ) );
+}
+
+$audio_base64 = base64_encode( $audio_bytes );</code></pre>
+
+[caption id="attachment_211767" align="alignnone" width="1594"]<img src="https://wordpress.com/wp-content/uploads/2026/06/mime-type-error.png" alt="Invalid file type error" width="1594" height="1190" class="size-full wp-image-211767" /> An error message is generated when the user attempts to process an invalid file type[/caption]
+
+Thus, the binary file has been converted into a string that can be passed to the AI Client. We can now move on to extracting the text:
+
+<pre><code class="language-php">$output_language = self::get_output_language();
+
+$transcription_builder = wp_ai_client_prompt(
+	&quot;Transcribe this voice note accurately into $output_language. Return plain text only.&quot;
+)
+	-&gt;with_file( $audio_base64, $mime_type )
+	-&gt;using_temperature( 0.1 );
+
+if ( ! $transcription_builder-&gt;is_supported_for_text_generation() ) {
+	return new \WP_Error(
+		'no_supported_model',
+		'No configured AI model can process this request. Configure a provider in Settings &gt; Connectors.',
+		array( 'status' =&gt; 400 )
+	);
+}
+
+$transcript = $transcription_builder-&gt;generate_text();</code></pre>
+
+Here is a breakdown of what the code above does.
+<ul>
+	<li><code>get_output_language()</code> is a static method defined elsewhere in the script that returns the site's locale. (See <a href="https://github.com/carlodaniele/ai-content-builder/blob/35ef318c10768969e235c89617a59cc4b6b38eb4/ai-content-builder.php#L135" target="_blank" rel="noopener noreferrer">GitHub</a>.) </li>
+	<li><code>wp_ai_client_prompt()</code> initializes a new request by passing the main prompt.</li>
+	<li><code>with_file()</code> tells the AI Client that we are sending a multimodal request; it accepts the file content in Base64 and the MIME type.</li>
+	<li><code>using_temperature()</code> allows you to specify the level of determinism of the response. We set a low value to obtain a faithful transcription of the audio.</li>
+	<li>The <code>is_supported_for_text_generation()</code> method checks whether the AI provider can generate text from the provided data; if the provider does not support multimodal input, the plugin halts and returns an error message.</li>
+	<li>The <code>generate_text()</code> method initiates the HTTP request.</li>
+</ul>
+<h3 id="second-ai-pass">3. Converting the audio transcript into structured content</h3>
+Now that we have the transcript, the plugin must communicate with the AI provider again to obtain a structured JSON response. For this, we need to define a structured array in JSON format.
+
+<pre><code class="language-php">$schema = array(
+	'type'       =&gt; 'object',
+	'properties' =&gt; array(
+		'title'    =&gt; array( 'type' =&gt; 'string' ),
+		'sections' =&gt; array(
+			'type'  =&gt; 'array',
+			'items' =&gt; array(
+				'type'       =&gt; 'object',
+				'properties' =&gt; array(
+					'heading'    =&gt; array( 'type' =&gt; 'string' ),
+					'level'      =&gt; array(
+						'type' =&gt; 'integer',
+					),
+					'paragraphs' =&gt; array(
+						'type'  =&gt; 'array',
+						'items' =&gt; array( 'type' =&gt; 'string' ),
+					),
+					'bullet_points' =&gt; array(
+						'type'  =&gt; 'array',
+						'items' =&gt; array( 'type' =&gt; 'string' ),
+					),
+				),
+				'required'   =&gt; array( 'heading', 'level', 'paragraphs' ),
+			),
+		),
+	),
+	'required'   =&gt; array( 'title', 'sections' ),
+);</code></pre>
+
+With this structure, the AI will respond with a JSON object containing a title and an array of sections. Each section must contain a heading, a heading level, at least one paragraph, and bullet points.
+
+Now that the schema is defined, we can move on to configuring the second request to the AI client:
+
+<pre><code class="language-php">$structured_json = wp_ai_client_prompt(
+	&quot;Convert the following transcript into a concise, blog-ready draft in $output_language.\n&quot; .
+	&quot;Return JSON with a post title and body sections.\n&quot; .
+	&quot;Each section must have: heading, level (2 or 3), and paragraphs (array).\n&quot; .
+	&quot;If useful, include bullet_points (array) for short actionable lists.\n&quot; .
+	&quot;Use short, clear headings and readable paragraph text.\n\n&quot; .
+	&quot;Transcript:\n&quot; . $transcript
+)
+	-&gt;using_system_instruction( &quot;You are a professional WordPress content editor. Always write in $output_language (use appropriate spelling, grammar, and conventions for that language variant).&quot; )
+	-&gt;using_temperature( 0.4 )
+	-&gt;as_json_response( $schema )
+	-&gt;generate_text();
+
+if ( is_wp_error( $structured_json ) ) {
+	return $structured_json;
+}</code></pre>
+
+Let's break down the key points of this code:
+<ul>
+	<li><code>using_system_instruction()</code> defines the model's persona.</li>
+	<li><code>using_temperature( 0.4 )</code> sets a higher temperature value, giving the AI greater creative freedom to generate a response and produce more fluid, rich prose.</li>
+	<li><code>as_json_response( $schema )</code> instructs the client to provide the response in a structured format.</li>
+	<li>The plugin stops in case of an error.</li>
+</ul>
+The next step is to decode and sanitize the data.
+
+<pre><code class="language-php">$structured = json_decode( (string) $structured_json, true );
+
+if ( ! is_array( $structured ) ) {
+	return new \WP_Error(
+		'invalid_ai_json',
+		'Could not parse structured AI response.',
+		array( 'status' =&gt; 500 )
+	);
+}
+
+$normalized = self::normalize_structured_post( $structured );
+
+if ( '' === $normalized['title'] &amp;&amp; empty( $normalized['sections'] ) ) {
+	return new \WP_Error(
+		'empty_structured_content',
+		'The AI provider returned empty structured content.',
+		array( 'status' =&gt; 500 )
+	);
+}</code></pre>
+
+In the code above:
+<ul>
+	<li>The function <code>json_decode()</code> converts the JSON string into a PHP associative array.</li>
+	<li>If the JSON is malformed, the following check returns a 500 status code along with a clear error message.</li>
+	<li>The static method <code>normalize_structured_post()</code> sanitizes and normalizes the provider's output before exposing it to JavaScript (see this function's definition on <a href="https://github.com/carlodaniele/ai-content-builder/blob/35ef318c10768969e235c89617a59cc4b6b38eb4/ai-content-builder.php#L476" target="_blank" rel="noopener noreferrer">GitHub</a>).</li>
+</ul>
+The only thing left to do now is pass the resulting output to JavaScript to generate native Gutenberg blocks.
+<h3 id="block-generation">4. Generating Gutenberg-ready output</h3>
+The next step is to map the JSON output to native Gutenberg blocks. This phase occurs on the client side and is handled by the <code>editor.js</code> file.
+
+When the user selects an audio file, the <a href="https://github.com/carlodaniele/ai-content-builder/blob/35ef318c10768969e235c89617a59cc4b6b38eb4/editor.js#L342" target="_blank" rel="noopener noreferrer">following code</a> is triggered:
+
+<pre><code class="language-javascript">function AIContentBuilderSidebar() {
+
+	const [ audioId, setAudioId ] = useState( 0 );
+	...
+
+	const onSelectAudio = function ( media ) {
+		if ( ! media || ! media.id ) {
+			return;
+		}
+		setAudioId( media.id );
+		setAudioLabel( media.title || media.filename || ( 'Audio #' + media.id ) );
+		setNotice( null );
+	};
+	...
+}</code></pre>
+
+This code retrieves the ID of the recorded audio file from the WordPress database.
+
+When the user clicks on the <strong>Generate Content</strong> button, the <a href="https://github.com/carlodaniele/ai-content-builder/blob/35ef318c10768969e235c89617a59cc4b6b38eb4/editor.js#L382" target="_blank" rel="noopener noreferrer"><code>onGenerate()</code> function</a> uses <code>apiFetch()</code> to send a POST request to the API endpoint, including the audio ID, among other things.
+
+<pre><code class="language-javascript">const onGenerate = async function () {
+
+	...
+
+	try {
+		const response = await apiFetch( {
+			path: AICBData.restPath,
+			method: 'POST',
+			headers: {
+				'X-WP-Nonce': AICBData.nonce,
+			},
+			data: {
+				audio_id: audioId,
+			},
+		} );
+		...
+	}
+	...
+}</code></pre>
+<ul>
+	<li><code>await</code> pauses the function temporarily to prevent the browser from freezing while waiting for the AI's response.</li>
+	<li>Once received, the JSON object is stored temporarily in the <code>response</code> variable.</li>
+</ul>
+The content of the <code>response</code> variable will be an object structured as follows:
+
+<pre><code class="language-json">{
+	title: "Two Wheels to the Medina: ...",
+	sections: [
+		{
+			heading: "A Well-Deserved Rest in the Red City",
+			level: 2,
+			paragraphs: [ "On April 24th, our group of seven motorcyclists..." ],
+			bullet_points: []
+		},
+		{
+			heading: "Diving into the Medina and Jemaa el-Fnaa",
+			level: 2,
+			paragraphs: [ "We spent the day exploring the historic Medina..." ],
+			bullet_points: [ 
+				"Navigating the vibrant, maze-like alleys of the ancient Medina", 
+				"Tasting traditional Berber tagines and Moroccan mint tea",
+				"Shopping for handmade leather goods, spices, and lanterns in the souks" 
+			]
+		},
+		{...}
+	],
+	content: "Fallback plain text...",
+	transcript: "Full transcript..."
+}</code></pre>
+
+This object provides the necessary data to create the blocks. However, the script may receive either a JSON string or JSON nested within an object. Therefore, an additional normalization step is needed before extracting the data for block generation: 
+
+<pre><code class="language-javascript">const normalizedSections = normalizeSectionsPayload( response.sections );</code></pre>
+
+<ul>
+	<li>The <code>normalizeSectionsPayload()</code> function normalizes uncertain <code>sections</code> payloads into an array. (See <a href="https://github.com/carlodaniele/ai-content-builder/blob/35ef318c10768969e235c89617a59cc4b6b38eb4/editor.js#L171" target="_blank" rel="noopener noreferrer">code on GitHub</a>.)</li>
+</ul>
+Next, the <code>normalizedSections</code> variable is passed as an argument to the <a href="https://github.com/carlodaniele/ai-content-builder/blob/35ef318c10768969e235c89617a59cc4b6b38eb4/editor.js#L60" target="_blank" rel="noopener noreferrer">function that converts</a> the <code>sections</code> fields into native Gutenberg blocks:
+
+<pre><code class="language-javascript">const structuredBlocks = buildBlocksFromSections( normalizedSections );</code></pre>
+
+Below is an excerpt from the <code>buildBlocksFromSections()</code> function:
+
+<pre><code class="language-javascript">function buildBlocksFromSections( sections ) {
+	if ( ! Array.isArray( sections ) ) {
+		return [];
+	}
+
+	const blocks = [];
+
+	sections.forEach( function ( section ) {
+		if ( ! section || 'object' !== typeof section ) {
+				return;
+			}
+
+			const heading =
+				( 'string' === typeof section.heading )
+					? section.heading.trim()
+					: '';
+
+			const level = ( 3 === section.level ) ? 3 : 2;
+
+			if ( heading ) {
+				blocks.push(
+					createBlock( 'core/heading', {
+						content: heading,
+						level: level,
+					} )
+				);
+			}
+
+			...
+
+		} );
+	return blocks;
+}</code></pre>
+
+In the above code, the <code>forEach()</code> cycle loops through the data array, extracting <code>section.heading</code> and <code>section.level</code> to be used by the native <code>createBlock()</code> function. 
+
+For the mapping of <code>section.paragraphs</code> and <code>section.bullet_points</code>, please refer to the <a href="https://github.com/carlodaniele/ai-content-builder/blob/35ef318c10768969e235c89617a59cc4b6b38eb4/editor.js#L60" target="_blank" rel="noopener noreferrer">source code on GitHub</a>.
+
+<h2>Endless extension possibilities</h2>
+The introduction of AI in WordPress opens up brand-new horizons for site admins and developers alike. While you previously had to build an entire network infrastructure from scratch just to inject AI features into your WordPress site, automating your editorial workflow and adding AI-powered features has now become remarkably straightforward.
+
+The example plugin showcased in the second part of this article highlights just a single use case. However, it clearly demonstrates how you can now build tools that drastically simplify site management and content editing. Furthermore, this architecture unlocks advanced capabilities that were previously either too complex to implement or expensive.
+
+And yet, we are only getting started. Artificial intelligence is an evolving reality that will undoubtedly trigger a massive wave of innovation.
+
+Speaking of innovation... Have you tried WordPress's hosting yet? If you want to empower your website with the absolute best technology available today for WordPress, <a href="https://wordpress.com/pricing/">try WordPress risk-free</a> or <a href="https://wordpress.com/talk-to-sales/">contact our sales team</a> to learn more.

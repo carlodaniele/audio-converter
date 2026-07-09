@@ -1,0 +1,19 @@
+{
+  "contract_version": "1.0.0",
+  "run_id": "run_01J0Z1ERROR1234",
+  "status": "failed",
+  "quality_flags": [],
+  "processing_timestamps": {
+    "started_at": "2026-07-07T17:10:00Z",
+    "completed_at": "2026-07-07T17:10:02Z"
+  },
+  "debug_reference_id": "dbg_01J0Z1ERROR9999",
+  "error": {
+    "code": "ai_provider_unavailable",
+    "message": "No configured AI connector is available.",
+    "retryable": true,
+    "details": {
+      "provider": "unknown"
+    }
+  }
+}

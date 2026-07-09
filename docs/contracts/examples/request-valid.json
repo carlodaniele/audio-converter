@@ -1,0 +1,33 @@
+{
+  "contract_version": "1.0.0",
+  "external_run_id": "tg-20260707-0001",
+  "source": "telegram",
+  "source_metadata": {
+    "chat_id": "12345",
+    "message_id": "67890"
+  },
+  "audio": {
+    "signed_url": "https://example.com/audio/voice-note-1.mp3"
+  },
+  "editorial_options": {
+    "language": "en-US",
+    "tone": "professional",
+    "target_length": "medium",
+    "constraints": [
+      "Use clear headings",
+      "Avoid hype"
+    ]
+  },
+  "proper_noun_hints": [
+    "WordPress",
+    "Gutenberg",
+    "WordPress"
+  ],
+  "publish_options": {
+    "status": "draft",
+    "post_type": "post",
+    "taxonomy_terms": {
+      "category": ["ai", "wordpress"]
+    }
+  }
+}

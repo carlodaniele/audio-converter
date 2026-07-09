@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "audio-to-post input v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "external_run_id",
+    "source",
+    "audio"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "pattern": "^1\\.[0-9]+\\.[0-9]+$"
+    },
+    "external_run_id": {
+      "type": "string",
+      "minLength": 3,
+      "maxLength": 128
+    },
+    "source": {
+      "type": "string",
+      "enum": ["telegram", "web", "api", "manual"]
+    },
+    "source_metadata": {
+      "type": "object",
+      "additionalProperties": true
+    },
+    "audio": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "media_id": { "type": "integer", "minimum": 1 },
+        "signed_url": { "type": "string", "format": "uri" },
+        "base64": { "type": "string", "minLength": 16 },
+        "mime_type": { "type": "string" }
+      },
+      "oneOf": [
+        { "required": ["media_id"] },
+        { "required": ["signed_url"] },
+        { "required": ["base64", "mime_type"] }
+      ]
+    },
+    "editorial_options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "language": { "type": "string" },
+        "tone": {
+          "type": "string",
+          "enum": ["neutral", "professional", "conversational"]
+        },
+        "target_length": {
+          "type": "string",
+          "enum": ["short", "medium", "long"]
+        },
+        "constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "proper_noun_hints": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "publish_options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["draft", "publish"]
+        },
+        "post_type": { "type": "string" },
+        "taxonomy_terms": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "array",
+            "items": { "type": ["string", "integer"] }
+          }
+        }
+      }
+    },
+    "media_options": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "featured_image_id": { "type": "integer", "minimum": 1 },
+        "gallery_image_ids": {
+          "type": "array",
+          "items": { "type": "integer", "minimum": 1 }
+        }
+      }
+    }
+  }
+}

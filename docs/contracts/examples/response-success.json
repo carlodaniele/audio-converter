@@ -1,0 +1,15 @@
+{
+  "contract_version": "1.0.0",
+  "run_id": "run_01J0Z1ABCD1234",
+  "post_id": 4321,
+  "post_url": "https://example.com/?p=4321",
+  "status": "completed",
+  "quality_flags": [
+    "proper_nouns_checked"
+  ],
+  "processing_timestamps": {
+    "started_at": "2026-07-07T17:10:00Z",
+    "completed_at": "2026-07-07T17:10:09Z"
+  },
+  "debug_reference_id": "dbg_01J0Z1ABCD9999"
+}

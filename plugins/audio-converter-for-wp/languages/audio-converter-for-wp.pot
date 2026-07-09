@@ -1,0 +1,205 @@
+# Copyright (C) 2026 Audio Converter Team
+# This file is distributed under the GPL-2.0-or-later.
+msgid ""
+msgstr ""
+"Project-Id-Version: Audio Converter for WP 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/audio-converter-for-wp\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-07T16:21:07+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"X-Generator: WP-CLI 2.12.0\n"
+"X-Domain: audio-converter-for-wp\n"
+
+#. Plugin Name of the plugin
+#: audio-converter-for-wp.php
+msgid "Audio Converter for WP"
+msgstr ""
+
+#. Description of the plugin
+#: audio-converter-for-wp.php
+msgid "Ability-first audio-to-post pipeline skeleton for WordPress."
+msgstr ""
+
+#. Author of the plugin
+#: audio-converter-for-wp.php
+msgid "Audio Converter Team"
+msgstr ""
+
+#: assets/editor-sidebar.js:48
+msgid "short (~250-450 words)"
+msgstr ""
+
+#: assets/editor-sidebar.js:52
+msgid "long (~900-1400 words)"
+msgstr ""
+
+#: assets/editor-sidebar.js:55
+msgid "medium (~500-850 words)"
+msgstr ""
+
+#: assets/editor-sidebar.js:60
+msgid "Approximate output length: 250 to 450 words."
+msgstr ""
+
+#: assets/editor-sidebar.js:64
+msgid "Approximate output length: 900 to 1400 words."
+msgstr ""
+
+#: assets/editor-sidebar.js:67
+msgid "Approximate output length: 500 to 850 words."
+msgstr ""
+
+#: assets/editor-sidebar.js:213
+msgid "WordPress media library is unavailable."
+msgstr ""
+
+#: assets/editor-sidebar.js:218
+msgid "Select audio"
+msgstr ""
+
+#: assets/editor-sidebar.js:219
+msgid "Use this audio"
+msgstr ""
+
+#: assets/editor-sidebar.js:232
+#, js-format
+msgid "Audio #%d"
+msgstr ""
+
+#: assets/editor-sidebar.js:241
+msgid "Plugin configuration missing in editor context."
+msgstr ""
+
+#: assets/editor-sidebar.js:246
+msgid "Select an audio file first."
+msgstr ""
+
+#: assets/editor-sidebar.js:281
+msgid "Generation failed."
+msgstr ""
+
+#: assets/editor-sidebar.js:287
+msgid "Run accepted. Current status:"
+msgstr ""
+
+#: assets/editor-sidebar.js:295
+msgid "No blocks were inserted into the editor."
+msgstr ""
+
+#: assets/editor-sidebar.js:303
+#, js-format
+msgid "Content generated successfully. Approximate word count: %d."
+msgstr ""
+
+#: assets/editor-sidebar.js:308
+msgid "Content generated successfully."
+msgstr ""
+
+#: assets/editor-sidebar.js:313
+msgid "Unexpected request error."
+msgstr ""
+
+#: assets/editor-sidebar.js:327
+msgid "Audio source"
+msgstr ""
+
+#: assets/editor-sidebar.js:328
+msgid "Select audio from Media Library"
+msgstr ""
+
+#: assets/editor-sidebar.js:329
+msgid "Selected:"
+msgstr ""
+
+#: assets/editor-sidebar.js:329
+msgid "No audio selected"
+msgstr ""
+
+#: assets/editor-sidebar.js:333
+msgid "Editorial options"
+msgstr ""
+
+#: assets/editor-sidebar.js:338
+msgid "Language"
+msgstr ""
+
+#: assets/editor-sidebar.js:341
+msgid "Use a BCP-47 locale (example: en-US, it-IT)."
+msgstr ""
+
+#: assets/editor-sidebar.js:348
+msgid "Tone"
+msgstr ""
+
+#: assets/editor-sidebar.js:351
+msgid "professional"
+msgstr ""
+
+#: assets/editor-sidebar.js:352
+msgid "neutral"
+msgstr ""
+
+#: assets/editor-sidebar.js:353
+msgid "conversational"
+msgstr ""
+
+#: assets/editor-sidebar.js:355
+msgid "Defines the writing style used for the generated draft."
+msgstr ""
+
+#: assets/editor-sidebar.js:363
+msgid "Target length"
+msgstr ""
+
+#: assets/editor-sidebar.js:378
+msgid "Proper noun hints (comma or new line separated)"
+msgstr ""
+
+#: assets/editor-sidebar.js:381
+msgid "Use this field to protect names that must remain accurate (people, places, brands, products). Example: Marrakech, BMW GS."
+msgstr ""
+
+#: assets/editor-sidebar.js:389
+msgid "Editor insertion mode"
+msgstr ""
+
+#: assets/editor-sidebar.js:392
+msgid "Append (recommended)"
+msgstr ""
+
+#: assets/editor-sidebar.js:393
+msgid "Replace"
+msgstr ""
+
+#: assets/editor-sidebar.js:395
+msgid "Append adds new blocks at the end. Replace overwrites current editor blocks."
+msgstr ""
+
+#: assets/editor-sidebar.js:402
+msgid "Generate"
+msgstr ""
+
+#: assets/editor-sidebar.js:406
+msgid "Audio selected. Ready to generate."
+msgstr ""
+
+#: assets/editor-sidebar.js:406
+msgid "Select an audio file to enable generation."
+msgstr ""
+
+#: assets/editor-sidebar.js:416
+msgid "Generating..."
+msgstr ""
+
+#: assets/editor-sidebar.js:416
+msgid "Generate draft from audio"
+msgstr ""
+
+#: assets/editor-sidebar.js:427
+#: assets/editor-sidebar.js:428
+msgid "Audio Converter"
+msgstr ""

@@ -1,0 +1,852 @@
+The Abilities API, introduced in <a href="https://wordpress.com/blog/wordpress-6-9/#abilities-api">WordPress 6.9</a>, establishes a shared language, allowing all WordPress components—both core and plugins—to expose their functionalities in a unified, understandable way for both humans and machines. This makes your WordPress site ready for integration with external automation tools in a standardized and secure manner.
+
+If you are wondering what some use cases for the Abilities API might look like, think of an AI model that guides a user through a purchasing process and then even allows them to complete the purchase itself without touching your e-commerce website. Or think of a <a href="https://wordpress.com/blog/how-to-setup-ci-cd-pipeline/">CI/CD pipeline on GitHub Actions</a> that processes text extracted from an audio or video file and sends it to WordPress for publication. The use cases are endless.
+
+The Abilities API changes the very role of WordPress within the ecosystem. It is no longer just a blog, nor even a CMS; today, WordPress acts as a distributed execution engine that can be orchestrated from the outside, like a sort of operating system, fully ready for autonomous agents.
+
+Curious to learn more? Let’s dive in.
+[toc]
+<h2>What an ability is intended for</h2>
+An ability is a discoverable, actionable capability on a WordPress site that enables specific operations for external entities (such as AI models) or internal components.
+
+The API can be used for things like:
+<ul>
+	<li>Searching for content or executing specific database operations</li>
+	<li>Reading site configuration settings</li>
+	<li>Creating a post</li>
+	<li>Converting a JSON structure into Gutenberg blocks</li>
+</ul>
+Exposing an ability means making a specific functionality interoperable. Before an ability can be discovered and used, it must be registered in a centralized catalog. Only then can WordPress and AI models discover it, understand its intent, and invoke it when needed.
+
+[notice type="info"]One clarification is necessary: an AI model never has direct access to your site. It can only ask WordPress to execute an operation (for example, "give me the total number of posts on the site") required to complete its task.[/notice]
+
+By default, your plugins' functionality is fully isolated. By registering an ability, you declare that the underlying logic is available as a service for the entire ecosystem.
+
+Let's look at an example. If your plugin has a function that converts an initial JSON object into structured content ready for Gutenberg blocks, you can register it as an ability. This allows other tools with the required permissions to trigger the exact same function.
+
+In our previous <a href="https://wordpress.com/blog/wordpress-ai/">tutorial on the WordPress AI Client</a>, the plugin handled the core logic of sending an audio file to the AI model, which returned a JSON-structured response to generate Gutenberg blocks. However, that functionality remained restricted to our plugin. By registering this process as an ability, you decouple the execution, and any external entity can trigger the entire plugin logic by simply passing a JSON object containing an audio file ID.
+
+<strong>An ability serves as a formal contract</strong> between the underlying PHP logic and any entity that requests its execution. The contract specifies the data the ability expects as input, its intent, and the data schema it returns as output.
+
+When you register an ability, it is added to your site's <a href="https://make.wordpress.org/ai/2025/07/17/abilities-api/" target="_blank" rel="noopener noreferrer">ability registry</a>. From that moment on, <strong>WordPress acts as a secure gateway</strong>: it verifies authentication and validates incoming data against the schema established by the contract. WordPress routes the request to the underlying PHP function only if the payload strictly complies with the contract.
+
+<strong>An ability is agnostic.</strong> WordPress does not need to know the specific entity requesting access; it only verifies that the request is authorized and meets the contract’s constraints.
+
+By registering an ability, your plugin is no longer just an extension with its own internal logic; it becomes a service provider for the entire ecosystem. Whether it is a mobile app, an automation script like Make.com or <a href="https://wordpress.com/blog/woocommerce-zapier/">Zapier</a>, an AI agent, or a server communicating via the <a href="https://wordpress.com/blog/mcp-server-wordpress-api/">MCP protocol</a>, these entities will know exactly how to trigger structured operations on your site.
+
+<h2>Working with the Abilities API</h2>
+The Abilities API provides a <a href="https://github.com/WordPress/abilities-api/blob/trunk/docs/php-api.md" target="_blank" rel="noopener noreferrer">comprehensive set of functions</a> that allow you to discover registered abilities on your site, activate them, and both register and unregister abilities.
+[sub-toc count-number="3"]
+<h3>Work with your site's abilities</h3>
+You can retrieve a list of all registered abilities or fetch an individual ability object. You can also verify conditions, such as whether a specific ability is registered or if the agent has the permissions to trigger it. 
+[sub-toc selector="h4" count-number="4"]
+<h4>Get a list of the abilities registered on your site</h4>
+The <a href="https://developer.wordpress.org/reference/functions/wp_get_abilities/" target="_blank" rel="noopener noreferrer"><code>wp_get_abilities()</code> function</a> returns an array of all registered abilities. You can test it using <a href="https://wordpress.com/blog/wp-cli/">WP-CLI</a>. Once you <a href="https://wordpress.com/blog/remote-wordpress-development-wordpress-ssh/">connect to your site via SSH</a>, navigate to the site's root directory, where your <a href="https://wordpress.com/blog/wp-config-php/"><code>wp-config.php</code> file</a> lives, using the following commands:
+
+<pre><code class="language-bash">cd /path/to/your/site
+ls wp-config.php</code></pre>
+
+Next, make sure WP-CLI recognizes your site installation:
+
+<pre><code class="language-bash">wp core is-installed
+wp option get siteurl</code></pre>
+
+If you get your site URL, you are ready to go and run the following command:
+
+<pre><code class="language-bash">wp eval '$abilities = wp_get_abilities(); foreach ( $abilities as $a ) { echo $a-&gt;get_name() . PHP_EOL; }'</code></pre>
+
+This command executes <a href="https://developer.wordpress.org/cli/commands/eval/" target="_blank" rel="noopener noreferrer">PHP code in your terminal</a>. The PHP requests the names of every registered ability on your site, and by default, it should provide the following response:
+
+<pre><code class="language-bash">core/get-site-info
+core/get-user-info
+core/get-environment-info</code></pre>
+
+You could request a more complete set of data with the following command:
+
+<pre><code class="language-bash">wp eval '
+$all_abilities = wp_get_abilities();
+
+foreach ( $all_abilities as $ability ) {
+	echo "Ability Name: " . esc_html( $ability-&gt;get_name() ) . "\n";
+	echo "Label: " . esc_html( $ability-&gt;get_label() ) . "\n";
+	echo "Category: " . esc_html( $ability-&gt;get_category() ) . "\n";
+	echo "Description: " . esc_html( $ability-&gt;get_description() ) . "\n";
+	echo "---\n";
+}
+'</code></pre>
+
+When you run this command on a fresh <a href="https://wordpress.com/blog/wordpress-7-0/">WordPress 7.0</a> site, the terminal will show the following response:
+
+<pre><code>Ability Name: core/get-site-info
+Label: Get Site Information
+Category: site
+Description: Returns site information configured in WordPress. By default returns all fields, or optionally a filtered subset.
+---
+Ability Name: core/get-user-info
+Label: Get User Information
+Category: user
+Description: Returns profile details for the current authenticated user to support personalization, auditing, and access-aware behavior. By default returns all fields, or optionally a filtered subset.
+---
+Ability Name: core/get-environment-info
+Label: Get Environment Info
+Category: site
+Description: Returns core details about the site&#039;s runtime context for diagnostics and compatibility (environment, PHP runtime, database server info, WordPress version). By default returns all fields, or optionally a filtered subset.
+---</code></pre>
+
+<h4>Get an ability object</h4>
+The <a href="https://developer.wordpress.org/reference/functions/wp_get_ability/" target="_blank" rel="noopener noreferrer"><code>wp_get_ability()</code> function</a> returns a single ability object by its name. You can test it in WP-CLI with the following command:
+
+<pre><code class="language-bash">wp eval '
+$ability = wp_get_ability( "core/get-site-info" );
+
+if ( ! $ability ) {
+	echo "Ability not found\n";
+	exit( 1 );
+}
+
+echo "Name: " . $ability-&gt;get_name() . "\n";
+echo "Label: " . $ability-&gt;get_label() . "\n";
+echo "Category: " . $ability-&gt;get_category() . "\n";
+echo "Description: " . $ability-&gt;get_description() . "\n";
+echo "\nInput Schema:\n";
+var_dump( $ability-&gt;get_input_schema() );
+echo "\nOutput Schema:\n";
+var_dump( $ability-&gt;get_output_schema() );
+echo "\nMeta:\n";
+var_dump( $ability-&gt;get_meta() );
+'</code></pre>
+
+If the ability is correctly registered on your site, you will receive the following response in your terminal:
+
+<pre><code>Name: core/get-site-info
+Label: Get Site Information
+Category: site
+Description: Returns site information configured in WordPress. By default returns all fields, or optionally a filtered subset.
+
+Input Schema:
+array(4) {
+  ["type"]=&gt;
+  string(6) "object"
+  ["properties"]=&gt;
+  array(1) {
+	["fields"]=&gt;
+	array(3) {
+	  ["type"]=&gt;
+	  string(5) "array"
+	  ["items"]=&gt;
+	  array(2) {
+		["type"]=&gt;
+		string(6) "string"
+		["enum"]=&gt;
+		array(8) {
+		  [0]=&gt;
+		  string(4) "name"
+		  [1]=&gt;
+		  string(11) "description"
+		  [2]=&gt;
+		  string(3) "url"
+		  [3]=&gt;
+		  string(5) "wpurl"
+		  [4]=&gt;
+		  string(11) "admin_email"
+		  [5]=&gt;
+		  string(7) "charset"
+		  [6]=&gt;
+		  string(8) "language"
+		  [7]=&gt;
+		  string(7) "version"
+		}
+	  }
+	  ["description"]=&gt;
+	  string(81) "Optional: Limit response to specific fields. If omitted, all fields are returned."
+	}
+  }
+  ["additionalProperties"]=&gt;
+  bool(false)
+  ["default"]=&gt;
+  array(0) {
+  }
+}
+
+Output Schema:
+array(3) {
+  ["type"]=&gt;
+  string(6) "object"
+  ["properties"]=&gt;
+  array(8) {
+	["name"]=&gt;
+	array(3) {
+	  ["type"]=&gt;
+	  string(6) "string"
+	  ["title"]=&gt;
+	  string(10) "Site Title"
+	  ["description"]=&gt;
+	  string(15) "The site title."
+	}
+	["description"]=&gt;
+	array(3) {
+	  ["type"]=&gt;
+	  string(6) "string"
+	  ["title"]=&gt;
+	  string(7) "Tagline"
+	  ["description"]=&gt;
+	  string(17) "The site tagline."
+	}
+	["url"]=&gt;
+	array(3) {
+	  ["type"]=&gt;
+	  string(6) "string"
+	  ["title"]=&gt;
+	  string(18) "Site Address (URL)"
+	  ["description"]=&gt;
+	  string(94) "The public URL where visitors access the site. May differ from the WordPress installation URL."
+	}
+	["wpurl"]=&gt;
+	array(3) {
+	  ["type"]=&gt;
+	  string(6) "string"
+	  ["title"]=&gt;
+	  string(23) "WordPress Address (URL)"
+	  ["description"]=&gt;
+	  string(83) "The URL where WordPress core files are served. May differ from the public site URL."
+	}
+	["admin_email"]=&gt;
+	array(3) {
+	  ["type"]=&gt;
+	  string(6) "string"
+	  ["title"]=&gt;
+	  string(28) "Administration Email Address"
+	  ["description"]=&gt;
+	  string(37) "The site administrator email address."
+	}
+	["charset"]=&gt;
+	array(3) {
+	  ["type"]=&gt;
+	  string(6) "string"
+	  ["title"]=&gt;
+	  string(12) "Site Charset"
+	  ["description"]=&gt;
+	  string(28) "The site character encoding."
+	}
+	["language"]=&gt;
+	array(3) {
+	  ["type"]=&gt;
+	  string(6) "string"
+	  ["title"]=&gt;
+	  string(13) "Site Language"
+	  ["description"]=&gt;
+	  string(42) "The site locale in dash form (e.g. en-US)."
+	}
+	["version"]=&gt;
+	array(3) {
+	  ["type"]=&gt;
+	  string(6) "string"
+	  ["title"]=&gt;
+	  string(17) "WordPress Version"
+	  ["description"]=&gt;
+	  string(48) "The WordPress core version running on this site."
+	}
+  }
+  ["additionalProperties"]=&gt;
+  bool(false)
+}
+
+Meta:
+array(2) {
+  ["annotations"]=&gt;
+  array(3) {
+	["readonly"]=&gt;
+	bool(true)
+	["destructive"]=&gt;
+	bool(false)
+	["idempotent"]=&gt;
+	bool(true)
+  }
+  ["show_in_rest"]=&gt;
+  bool(true)
+}</code></pre>
+
+<h4>Check if an ability is registered</h4>
+The <a href="https://developer.wordpress.org/reference/functions/wp_has_ability/" target="_blank" rel="noopener noreferrer"><code>wp_has_ability()</code> function</a> allows you to check whether an ability is registered. In WP-CLI, you can use it like this:
+
+<pre><code class="language-bash">wp eval '
+if ( wp_has_ability( "core/get-site-info" ) ) {
+	echo "✓ core/get-site-info is registered\n";
+} else {
+	echo "✗ core/get-site-info not found\n";
+}
+'</code></pre>
+
+If the ability has been registered, the following message will appear on the terminal:
+
+<pre><code class="language-bash">✓ core/get-site-info is registered</code></pre>
+
+<h4>Check agent permissions</h4>
+You can check whether the current user has the permissions to execute an ability by using the <a href="https://developer.wordpress.org/reference/classes/wp_ability/check_permissions/" target="_blank" rel="noopener noreferrer"><code>check_permissions()</code> method</a> of the <code>$ability</code> object. This returns true, false, or a <code>WP_Error</code> object. Let's try to call this method from the terminal using the following WP-CLI command:
+
+<pre><code class="language-bash">wp --user=1 eval '
+$ability = wp_get_ability( "core/get-site-info" );
+if ( $ability ) {
+	$has_permissions = $ability-&gt;check_permissions();
+	if ( true === $has_permissions ) {
+		echo "You have permissions to execute this ability.";
+	} else {
+		if ( is_wp_error( $has_permissions ) ) {
+			error_log( "Permissions check failed: " . $has_permissions-&gt;get_error_message() );
+		}
+		echo "You do not have permissions to execute this ability.";
+	}
+} else {
+	echo "Ability not found.";
+}
+'</code></pre>
+
+Here we have set <code>--user=1</code>, which is why you will receive the following response:
+
+<pre><code class="language-bash">You have permissions to execute this ability.</code></pre>
+
+<h3>Register an ability</h3>
+It is now time to register an ability. To demonstrate a real-world use case, we will extend the plugin described in <a href="https://wordpress.com/blog/wordpress-ai/">our article on the WordPress AI Client</a>. The plugin sends an audio file to the AI model to extract the text and trigger the generation of Gutenberg blocks. In this section, we will look at how to register this process as an ability so that any entity with the necessary permissions can discover and use it.
+
+[notice type="info"]For the examples below, we only display the essential code. To experiment with the code provided in this section firsthand, we recommend downloading the <a href="https://github.com/carlodaniele/ai-content-builder-next" target="_blank" rel="noopener noreferrer">AI Content Builder Next</a> plugin from GitHub and installing it manually on a local or staging WordPress site.[/notice]
+
+Before registering a new ability, you must register a new ability category.
+
+For this, you will need to hook the <a href="https://developer.wordpress.org/reference/functions/wp_register_ability_category/" target="_blank" rel="noopener noreferrer"><code>wp_register_ability_category()</code> function</a> into the <code>wp_abilities_api_categories_init</code> hook.
+
+The function accepts a unique category slug and an associative array of arguments.
+
+Here is how to register your ability category:
+
+<pre><code class="language-php">function aicb_register_ability_category(): void {
+
+	if ( ! function_exists( 'wp_register_ability_category' ) ) {
+		return;
+	}
+
+	wp_register_ability_category(
+		'content-generation',
+		array(
+			'label'       =&gt; 'Content Generation',
+			'description' =&gt; 'AI-powered content transformation and structuring abilities',
+		)
+	);
+}
+add_action( 'wp_abilities_api_categories_init', 'aicb_register_ability_category' );</code></pre>
+
+The next step is to register the ability. To do this, you will hook the <a href="https://developer.wordpress.org/reference/functions/wp_register_ability/" target="_blank" rel="noopener noreferrer"><code>wp_register_ability()</code> function</a> into the <code>wp_abilities_api_init</code> action.
+
+The function accepts two arguments: the name of the ability, including its namespace, and an array of arguments for the ability's configuration.
+
+Here is the ability registration for the <a href="https://github.com/carlodaniele/ai-content-builder-next/blob/main/abilities.php" target="_blank" rel="noopener noreferrer">AI Content Builder plugin</a>:
+
+<pre><code class="language-php">function aicb_register_audio_to_gutenberg_blocks_ability(): void {
+
+	if ( ! function_exists( 'wp_register_ability' ) ) {
+		return;
+	}
+
+	$input_schema = array( ... );
+
+	$output_schema = array( ... );
+
+	wp_register_ability(
+		'ai-content-builder/audio-to-gutenberg-blocks',
+		array(
+			'category'            =&gt; 'content-generation',
+			'label'               =&gt; 'Audio to Gutenberg Blocks',
+			'description'         =&gt; 'Transcribes audio and converts the content into WordPress Gutenberg-compatible block objects.',
+			'input_schema'        =&gt; $input_schema,
+			'output_schema'       =&gt; $output_schema,
+			'execute_callback'    =&gt; 'aicb_audio_to_gutenberg_blocks_callback',
+			'permission_callback' =&gt; static function (): bool {
+				return current_user_can( 'edit_posts' );
+			},
+			'meta'                =&gt; array(
+				'show_in_rest' =&gt; true,
+				'annotations'  =&gt; array(
+					'readonly'     =&gt; false,
+					'destructive'  =&gt; false,
+					'idempotent'   =&gt; false,
+					'instructions' =&gt; 'Processes an audio attachment: transcribes it, generates structured blog content via AI, and returns Gutenberg-ready block objects.',
+				),
+			),
+		)
+	);
+}
+add_action( 'wp_abilities_api_init', 'aicb_register_audio_to_gutenberg_blocks_ability' );</code></pre>
+
+In the <code>wp_register_ability</code> function call, we configured the following arguments:
+<ul>
+	<li><code>category</code>: The category to which the ability belongs.</li>
+	<li><code>label</code>: The display name of the ability.</li>
+	<li><code>description</code>: A brief description of what the ability does and its purpose.</li>
+	<li><code>input_schema</code>: The data schema for the incoming input arguments.</li>
+	<li><code>output_schema</code>: The data schema provided and returned by the ability.</li>
+	<li><code>execute_callback</code>: The callback function to be executed when the ability is triggered.</li>
+	<li><code>permission_callback</code>: A callback function executed to verify that the agent has the required permissions to run the ability.</li>
+	<li><code>meta</code>: An array of additional metadata fields for the ability.</li>
+	<li><code>show_in_rest</code>: Determines whether or not to expose the ability within the WordPress REST API.</li>
+	<li><code>annotations</code>: An array of descriptive elements defining the ability's behavior.</li>
+</ul>
+<code>input_schema</code> is an array that defines the ability's input contract. It represents the JSON Schema definition for validating the ability’s input. In our specific use case, it is defined as follows:
+
+<pre><code class="language-php">$input_schema = array(
+	'type'       =&gt; 'object',
+	'properties' =&gt; array(
+		'audio_id' =&gt; array(
+			'type'        =&gt; 'integer',
+			'description' =&gt; 'The ID of the audio attachment to process and convert into Gutenberg blocks.',
+		),
+	),
+	'required'   =&gt; array( 'audio_id' ),
+);</code></pre>
+
+This JSON Schema represents the format that the input data must follow to use this ability. 
+
+<code>output_schema</code> is the output contract returned by the ability. In our example, each item is an object representing a JSON block:
+
+<pre><code class="language-php">$output_schema = array(
+	'type'       =&gt; 'object',
+	'properties' =&gt; array(
+		'title'      =&gt; array( 'type' =&gt; 'string' ),
+		'sections'   =&gt; array(
+			'type'  =&gt; 'array',
+			'items' =&gt; array( 'type' =&gt; 'object' ),
+		),
+		'blocks'     =&gt; array(
+			'type'  =&gt; 'array',
+			'items' =&gt; array( 'type' =&gt; 'object' ),
+		),
+		'transcript' =&gt; array( 'type' =&gt; 'string' ),
+	),
+	'required'   =&gt; array( 'blocks' ),
+);</code></pre>
+
+The next step is to define the callback function that executes when the ability is triggered (see the <a href="https://github.com/carlodaniele/ai-content-builder-next/blob/main/abilities.php#L483" target="_blank" rel="noopener noreferrer">full code on GitHub</a>):
+
+<pre><code class="language-php">function aicb_audio_to_gutenberg_blocks_callback( array $args ) {
+
+	// missing code
+	// see GitHub
+	...
+
+	$structured_json = wp_ai_client_prompt( $prompt )
+		-&gt;using_system_instruction( $instructions )
+		-&gt;using_temperature( 0.4 )
+		-&gt;as_json_response( $schema )
+		-&gt;generate_text();
+
+	if ( is_wp_error( $structured_json ) ) {
+		return $structured_json;
+	}
+
+	$structured = json_decode( (string) $structured_json, true );
+	if ( ! is_array( $structured ) ) {
+		return new \WP_Error(
+			'invalid_ai_json',
+			'Could not parse structured AI response.',
+			array( 'status' =&gt; 500 )
+		);
+	}
+
+	// Normalize the output.
+	$normalized = aicb_normalize_structured_post( $structured );
+
+	if ( '' === $normalized['title'] &amp;&amp; empty( $normalized['sections'] ) ) {
+		return new \WP_Error(
+			'empty_structured_content',
+			'The AI provider returned empty structured content.',
+			array( 'status' =&gt; 500 )
+		);
+	}
+
+	// Convert to Gutenberg blocks.
+	$blocks = aicb_sections_to_blocks( $normalized['title'], $normalized['sections'] );
+
+	return $blocks;
+}</code></pre>
+
+This function invokes two custom functions. The first one (<code>aicb_normalize_structured_post</code>) normalizes the AI's output into a predefined format and sanitizes data:
+
+<pre><code class="language-php">function aicb_normalize_structured_post( array $structured ): array {
+	$title = isset( $structured['title'] )
+		? sanitize_text_field( (string) $structured['title'] )
+		: '';
+
+	$sections = array();
+
+	if ( isset( $structured['sections'] ) &amp;&amp; is_array( $structured['sections'] ) ) {
+		foreach ( $structured['sections'] as $section ) {
+			if ( ! is_array( $section ) ) {
+				continue;
+			}
+
+			$heading = isset( $section['heading'] )
+				? sanitize_text_field( (string) $section['heading'] )
+				: '';
+
+			$level = 2;
+
+			$paragraphs = array();
+			if ( isset( $section['paragraphs'] ) &amp;&amp; is_array( $section['paragraphs'] ) ) {
+				foreach ( $section['paragraphs'] as $paragraph ) {
+					$clean_paragraph = trim( sanitize_textarea_field( (string) $paragraph ) );
+					if ( '' !== $clean_paragraph ) {
+						$paragraphs[] = $clean_paragraph;
+					}
+				}
+			}
+
+			$bullet_points = array();
+			if ( isset( $section['bullet_points'] ) &amp;&amp; is_array( $section['bullet_points'] ) ) {
+				foreach ( $section['bullet_points'] as $bullet_point ) {
+					$clean_bullet_point = trim( sanitize_text_field( (string) $bullet_point ) );
+					if ( '' !== $clean_bullet_point ) {
+						$bullet_points[] = $clean_bullet_point;
+					}
+				}
+			}
+
+			if ( '' === $heading || empty( $paragraphs ) ) {
+				continue;
+			}
+
+			$sections[] = array(
+				'heading'       =&gt; $heading,
+				'level'         =&gt; $level,
+				'paragraphs'    =&gt; $paragraphs,
+				'bullet_points' =&gt; $bullet_points,
+			);
+		}
+	}
+
+	return array(
+		'title'    =&gt; $title,
+		'sections' =&gt; $sections,
+	);
+}</code></pre>
+
+The function accepts a structured array of JSON objects, normalizes and sanitizes the data, and returns an array containing the title and sections.
+
+The second function (<code>aicb_sections_to_blocks</code>) converts the normalized data into block descriptor objects and is defined as follows:
+
+<pre><code class="language-php">function aicb_sections_to_blocks( string $title, array $sections ): array {
+	$blocks = array();
+
+	foreach ( $sections as $section ) {
+		if ( ! is_array( $section ) ) {
+			continue;
+		}
+
+		$heading = isset( $section['heading'] ) ? trim( (string) $section['heading'] ) : '';
+		if ( '' === $heading ) {
+			continue;
+		}
+
+		$paragraphs = array();
+		if ( isset( $section['paragraphs'] ) &amp;&amp; is_array( $section['paragraphs'] ) ) {
+			foreach ( $section['paragraphs'] as $paragraph ) {
+				$clean = trim( (string) $paragraph );
+				if ( '' !== $clean ) {
+					$paragraphs[] = $clean;
+				}
+			}
+		}
+
+		if ( empty( $paragraphs ) ) {
+			continue;
+		}
+
+		$blocks[] = array(
+			'name'       =&gt; 'core/heading',
+			'attributes' =&gt; array(
+				'content' =&gt; $heading,
+				'level'   =&gt; 2,
+			),
+		);
+
+		foreach ( $paragraphs as $paragraph ) {
+			$blocks[] = array(
+				'name'       =&gt; 'core/paragraph',
+				'attributes' =&gt; array(
+					'content' =&gt; $paragraph,
+				),
+			);
+		}
+
+		if ( isset( $section['bullet_points'] ) &amp;&amp; is_array( $section['bullet_points'] ) ) {
+			$bullet_items_html = '';
+
+			foreach ( $section['bullet_points'] as $bullet_point ) {
+				$clean_bullet = trim( sanitize_text_field( (string) $bullet_point ) );
+				if ( '' === $clean_bullet ) {
+					continue;
+				}
+
+				// core/list expects HTML in the `values` attribute.
+				$bullet_items_html .= '&lt;li&gt;' . esc_html( $clean_bullet ) . '&lt;/li&gt;';
+			}
+
+			if ( '' !== $bullet_items_html ) {
+				$blocks[] = array(
+					'name'       =&gt; 'core/list',
+					'attributes' =&gt; array(
+						'values' =&gt; '&lt;ul&gt;' . $bullet_items_html . '&lt;/ul&gt;',
+					),
+				);
+			}
+		}
+	}
+
+	return $blocks;
+}</code></pre>
+
+Here are the key highlights of this function:
+<ul>
+	<li>The function accepts 2 arguments: a string representing the post title and an array of the sections generated by the AI model.</li>
+	<li>For each section, the function generates a heading and at least one paragraph.</li>
+	<li>If bullet points are present, it generates a corresponding number of list items.</li>
+	<li>The function returns a <code>$blocks</code> array of block descriptor objects, which is the output contract returned by the ability (<code>$output_schema</code>).</li>
+</ul>
+
+Note that the function's output is not the raw block markup. This will be generated client-side using the JavaScript <code>createBlock</code> function.
+
+For example, the heading element of a section is represented by the following object:
+
+<pre><code class="language-php">if ( '' !== $heading ) {
+	$blocks[] = array(
+		'name'       =&gt; 'core/heading',
+		'attributes' =&gt; array(
+			'content' =&gt; $heading,
+			'level'   =&gt; ( 3 === $level ) ? 3 : 2,
+		),
+	);
+}</code></pre>
+
+Once you have registered your ability, you can run the same WP-CLI commands seen above in your terminal to get the details. The following code will generate the input schema for your ability:
+
+<pre><code class="language-bash">wp --user=1 eval '
+$ability = wp_get_ability( "ai-content-builder/audio-to-gutenberg-blocks" );
+
+if ( ! $ability ) {
+    echo "Ability not found\n";
+    exit( 1 );
+}
+
+echo "Input Schema:\n";
+var_dump( $ability-&gt;get_input_schema() );
+'</code></pre>
+
+Here is the result in the terminal:
+
+<pre><code>Input Schema:
+array(3) {
+	["type"]=&gt;
+	string(6) "object"
+	["properties"]=&gt;
+	array(1) {
+		["audio_id"]=&gt;
+		array(2) {
+			["type"]=&gt;
+			string(7) "integer"
+			["description"]=&gt;
+			string(76) "The ID of the audio attachment to process and convert into Gutenberg blocks."
+		}
+	}
+	["required"]=&gt;
+	array(1) {
+		[0]=&gt;
+		string(8) "audio_id"
+	}
+}</code></pre>
+
+In the same way, you can retrieve the output schema of the ability:
+
+<pre><code class="language-bash">wp --user=1 eval '
+$ability = wp_get_ability( "ai-content-builder/audio-to-gutenberg-blocks" );
+
+if ( ! $ability ) {
+    echo "Ability not found\n";
+    exit( 1 );
+}
+
+echo "Output Schema:\n";
+var_dump( $ability-&gt;get_output_schema() );
+'</code></pre>
+
+You can also display the complete object of your ability with the following command:
+
+<pre><code class="language-bash">wp eval '
+$ability = wp_get_ability( "ai-content-builder/audio-to-gutenberg-blocks" );
+
+if ( ! $ability ) {
+	echo "Ability not found\n";
+	exit( 1 );
+}
+
+echo "Name: " . $ability-&gt;get_name() . "\n";
+echo "Label: " . $ability-&gt;get_label() . "\n";
+echo "Category: " . $ability-&gt;get_category() . "\n";
+echo "Description: " . $ability-&gt;get_description() . "\n";
+echo "\nInput Schema:\n";
+var_dump( $ability-&gt;get_input_schema() );
+echo "\nOutput Schema:\n";
+var_dump( $ability-&gt;get_output_schema() );
+'</code></pre>
+
+<h3>Executing an ability</h3>
+To run an ability, you will use the <code>execute()</code> method of the <code>$ability</code> object. You can try running the following PHP code via WP-CLI to trigger the <code>core/get-site-info</code> ability:
+
+<pre><code class="language-bash">wp --user=1 eval '
+$ability = wp_get_ability( "core/get-site-info" );
+
+if ( ! $ability ) {
+	echo "Ability not found\n";
+	exit(1);
+}
+
+$result = $ability-&gt;execute();
+
+if ( is_wp_error( $result ) ) {
+	echo "ERROR: " . $result-&gt;get_error_message() . "\n";
+	exit(1);
+}
+
+echo json_encode( $result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . "\n";
+'</code></pre>
+
+When you run this command, the ability will provide a JSON object similar to the following:
+
+<pre><code>{
+	"name": "WordPress 7.0",
+	"description": "",
+	"url": "http://yoursite.wordpress.cloud",
+	"wpurl": "http://yoursite.wordpress.cloud",
+	"admin_email": "yourname@youremail.com",
+	"charset": "UTF-8",
+	"language": "en-US",
+	"version": "7.1-alpha-62550"
+}</code></pre>
+
+The above is just a simple example of an ability that provides data for your site.
+
+As mentioned above, an ability can require input data, perform operations on that data, and return a structured output. We can see an example of this with the ability we registered in the previous section.
+
+Still in your terminal, navigate to your site's root directory and run the following PHP code:
+
+<pre><code class="language-bash">wp --user=1 eval '
+$ability = wp_get_ability( "ai-content-builder/audio-to-gutenberg-blocks" );
+
+if ( ! $ability ) {
+	echo "Ability not found\n";
+	exit( 1 );
+}
+
+$input = array( "audio_id" =&gt; 1755 );
+
+$result = $ability-&gt;execute( $input );
+
+if ( is_wp_error( $result ) ) {
+	echo "ERROR: " . $result-&gt;get_error_message() . "\n";
+	exit( 1 );
+}
+
+echo json_encode( $result, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES ) . "\n";
+'</code></pre>
+
+The <code>execute</code> method passes the structured input data to the ability, which returns an array of objects ready to be converted into Gutenberg blocks:
+
+<pre><code>[
+	{
+		"name": "core/heading",
+		"attributes": {
+			"content": "A Well-Deserved Rest Day in Marrakech",
+			"level": 2
+		}
+	},
+	{
+		"name": "core/paragraph",
+		"attributes": {
+			"content": "On April 24th, our group of seven motorcyclists took a break from the open road..."
+		}
+	},
+	{
+		"name": "core/heading",
+		"attributes": {
+			"content": "Exploring Jemaa el-Fnaa and the Medina",
+			"level": 2
+		}
+	},
+	{
+		"name": "core/paragraph",
+		"attributes": {
+			"content": "Our journey led us straight to Jemaa el-Fnaa, the legendary main square of Marrakech..."
+		}
+	},
+	{
+		"name": "core/list",
+		"attributes": {
+			"values": "&lt;ul&gt;&lt;li&gt;Navigating the bustling souks and narrow alleys of the ancient Medina.&lt;/li&gt;&lt;li&gt;Savoring traditional Moroccan and Berber dishes.&lt;/li&gt;&lt;li&gt;Experiencing the vibrant street performances and food stalls of Jemaa el-Fnaa at night.&lt;/li&gt;&lt;/ul&gt;"
+		}
+	},
+	...
+]</code></pre>
+<h2>REST API Integration</h2>
+The WordPress Abilities API provides a unified routing structure that allows external agents to programmatically query available ability categories (<code>/categories</code>), inspect specific ability contracts (<code>/abilities/{name}</code>), and execute a specific ability using the standard run endpoint (<code>/abilities/{name}/run</code>).
+
+[notice type="info"]All requests to the WordPress REST API require authentication. For external scripts or third-party tools such as Postman, use <a href="https://developer.wordpress.org/advanced-administration/security/application-passwords/" target="_blank" rel="noopener noreferrer">WordPress Application Passwords</a>.[/notice]
+
+Here, for example, is a GET request that returns the list of categories from our test site:
+
+<pre><code>https://yoursite.wordpress.cloud/wp-json/wp-abilities/v1/categories</code></pre>
+
+[caption id="attachment_212438" align="alignnone" width="1372"]<img src="https://wordpress.com/wp-content/uploads/2026/06/Screenshot-2026-06-26-alle-19.07.03.png" alt="GET request for ability categories in Postman" width="1372" height="496" class="size-full wp-image-212438" /> All requests must be authorized[/caption]
+
+When we registered the ability in the previous example, we set the <code>show_in_rest</code> parameter to <code>true</code>. By doing so, we made our ability automatically accessible via these native WordPress REST API endpoints under the centralized core namespace (<code>wp-abilities/v1</code>).
+
+This means that you don’t need to manually register custom routes from scratch to invoke an ability from an external environment. External agents can discover and execute your ability using standard HTTP requests.
+
+You can inspect the specific contract of our ability with the following GET request:
+
+<pre><code>https://yoursite.wordpress.cloud/wp-json/wp-abilities/v1/abilities/ai-content-builder/audio-to-gutenberg-blocks</code></pre>
+
+Finally, you can trigger the ability with an authenticated POST request:
+
+<pre><code>https://yoursite.wordpress.cloud/wp-json/wp-abilities/v1/abilities/ai-content-builder/audio-to-gutenberg-blocks/run</code></pre>
+
+When sending this type of request, make sure you have specified the input data. For our example, we have set the following JSON in the request body:
+
+<pre><code class="language-json">{
+	"input": {
+		"audio_id": YOUR_AUDIO_ID
+	}
+}</code></pre>
+
+[caption id="attachment_212446" align="alignnone" width="1378"]<img src="https://wordpress.com/wp-content/uploads/2026/06/run-ability-via-rest-1.png" alt="Executing an ability via HTTP request in Postman" width="1378" height="1286" class="size-full wp-image-212446" /> Executing an ability via HTTP request in Postman[/caption]
+
+Our ability processed the audio and dispatched it to the AI model configured on the site. The model returned a structured output that was subsequently normalized and sanitized, finally returning the following array of objects containing the block attributes:
+
+<pre><code class="language-json">{
+	"blocks": [
+		{
+			"name": "core/heading",
+			"attributes": { "content": "A Welcome Rest Day in Marrakech", "level": 2 }
+		},
+		{
+			"name": "core/paragraph",
+			"attributes": { "content": "On April 24, our group of seven motorcyclists paused our journey..." }
+		}
+	]
+}</code></pre>
+
+And this is precisely the outcome we were aiming for.
+
+[notice type="info"]Since the release of WordPress 7.0, the Abilities API is now also available via JavaScript, thanks to the implementation of the Client-Side Abilities API. Developers can leverage the two packages <code>@wordpress/abilities</code> and <code>@wordpress/core-abilities</code> to register abilities—complete with their input and output schemas, callbacks, and annotations—to implement client-side functionality. For an in-depth analysis, see the <a href="https://make.wordpress.org/core/2026/03/24/client-side-abilities-api-in-wordpress-7-0/" target="_blank" rel="noopener noreferrer">Client-Side Abilities API</a> dev note and the <a href="https://github.com/WordPress/abilities-api/blob/trunk/docs/javascript-client.md" target="_blank" rel="noopener noreferrer">JavaScript client documentation</a>.[/notice]
+
+<h2>The future of WordPress is agentic</h2>
+While the <a href="https://wordpress.com/blog/wordpress-ai/">AI Client and the new connector architecture</a> bring AI processing capabilities inside WordPress, the Abilities API redefines how WordPress interacts with the outside world. We are witnessing a drastic paradigm shift, moving from a traditional web architecture—based on manual user interaction where every integration required custom endpoints and manual mapping—to an intent-driven architecture designed from the ground up for automation.
+
+For WordPress developers, the new Abilities API represents an architectural turning point, characterized by decoupling functionality from plugins that contain its logic, enforcing security through the input/output contract, and enabling native interoperability across the entire ecosystem.
+
+Taken together, these features ensure that the Abilities API is not just another API, but a true distributed execution engine that offers a glimpse into an increasingly agentic future for WordPress.
