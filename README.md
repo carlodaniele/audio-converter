@@ -1,22 +1,41 @@
 # Audio Converter Program
 
-Questo workspace contiene gli asset operativi per avviare la Fase 1 (Discovery tecnica e baseline riusabile).
+Repository for an adapter-based audio-to-content system.
 
-## Obiettivo Fase 1
+## Current architecture target
 
-- Estrarre pattern riusabili dai repository di riferimento.
-- Identificare gap verso i requisiti commerciali.
-- Chiudere decisioni tecniche bloccanti.
-- Preparare backlog Sprint 1 senza ambiguita'.
+The project is evolving toward a platform-agnostic core plus adapters:
 
-## Struttura
+- `core/` shared business logic contract and orchestration notes.
+- `adapters/wordpress/` integration notes for WordPress.
+- `adapters/astro/` integration notes for Astro.
+- `plugins/audio-converter-for-wp/` current working WordPress adapter implementation.
+- `.github/workflows/` CI automation checks.
 
-- `docs/phase1/` documentazione operativa della fase.
-- `scripts/phase1/` script shell per bootstrap, discovery e validazione.
-- `references/repos/` repository di riferimento acquisiti dagli script.
-- `reports/phase1/` output prodotti dagli script.
+Detailed target notes are in:
 
-## Quick start
+- `docs/architecture-target.md`
+
+## Existing phase assets
+
+Discovery and historical artifacts are still available:
+
+- `docs/phase1/`
+- `scripts/phase1/`
+- `scripts/phase2/`
+- `scripts/phase3/`
+- `references/`
+- `reports/`
+
+## Quick checks
+
+Validate agnostic structure locally:
+
+```bash
+bash scripts/ci/validate-agnostic-structure.sh
+```
+
+Run phase scripts (legacy project phases):
 
 ```bash
 ./scripts/phase1/bootstrap.sh
@@ -30,6 +49,8 @@ Questo workspace contiene gli asset operativi per avviare la Fase 1 (Discovery t
 ./scripts/phase3/validate-phase3.sh
 ```
 
-## Note
+## Notes
 
-Gli script sono idempotenti: se i repository di riferimento sono gia' presenti, vengono aggiornati con `git pull --ff-only`.
+- WordPress is currently the active production adapter.
+- Astro adapter scaffolding is present and will be aligned to the same core contract.
+- CI includes an initial structure validation workflow in `.github/workflows/agnostic-structure.yml`.
