@@ -6,6 +6,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Audio_Converter_AI_Processor {
 	private const AI_MAX_RETRY_ATTEMPTS = 2;
+	private const FREE_DEFAULT_TEMPERATURE = 0.3;
+	private const MIN_TEMPERATURE          = 0.0;
+	private const MAX_TEMPERATURE          = 1.0;
 
 	private static function ai_error( string $code, string $message ) {
 		return Audio_Converter_Ability_Contract::error_response( $code, $message );
@@ -257,6 +260,52 @@ final class Audio_Converter_AI_Processor {
 		return $structured;
 	}
 
+	private static function is_pro_temperature_enabled(): bool {
+		return (bool) apply_filters( 'audio_converter_pro_temperature_enabled', false );
+	}
+
+	private static function clamp_temperature( float $value ): float {
+		if ( $value < self::MIN_TEMPERATURE ) {
+			return self::MIN_TEMPERATURE;
+		}
+
+		if ( $value > self::MAX_TEMPERATURE ) {
+			return self::MAX_TEMPERATURE;
+		}
+
+		return $value;
+	}
+
+	private static function generation_temperature( array $payload ): float {
+		$default = (float) self::FREE_DEFAULT_TEMPERATURE;
+
+		if ( ! self::is_pro_temperature_enabled() ) {
+			return $default;
+		}
+
+		$requested = $default;
+		if ( isset( $payload['editorial_options']['temperature'] ) && is_numeric( $payload['editorial_options']['temperature'] ) ) {
+			$requested = (float) $payload['editorial_options']['temperature'];
+		}
+
+		return self::clamp_temperature( $requested );
+	}
+
+	private static function temperature_observability_context( array $payload, float $effective ): array {
+		$pro_enabled   = self::is_pro_temperature_enabled();
+		$has_requested = isset( $payload['editorial_options']['temperature'] ) && is_numeric( $payload['editorial_options']['temperature'] );
+		$requested     = $has_requested ? (float) $payload['editorial_options']['temperature'] : (float) self::FREE_DEFAULT_TEMPERATURE;
+
+		return array(
+			'mode'              => $pro_enabled ? 'extended' : 'standard',
+			'pro_enabled'       => $pro_enabled,
+			'has_requested'     => $has_requested,
+			'requested'         => $requested,
+			'effective'         => $effective,
+			'external_run_id'   => isset( $payload['external_run_id'] ) ? (string) $payload['external_run_id'] : '',
+		);
+	}
+
 	public static function transcribe_and_structure( array $payload ) {
 		if ( ! function_exists( 'wp_ai_client_prompt' ) ) {
 			return Audio_Converter_Ability_Contract::error_response( 'ai_provider_unavailable', 'WordPress AI Client is not available.' );
@@ -270,6 +319,12 @@ final class Audio_Converter_AI_Processor {
 		$language = self::output_language( $payload );
 		$hint     = self::audio_context_hint( $payload );
 		$length   = self::target_length_range( $payload );
+		$generation_temperature = self::generation_temperature( $payload );
+
+		Audio_Converter_Observability::log_event(
+			'ai_generation_temperature_resolved',
+			self::temperature_observability_context( $payload, $generation_temperature )
+		);
 
 		$transcription_builder = wp_ai_client_prompt( "Transcribe this audio note accurately in {$language}. Return plain text only." )
 			->with_file( $audio_payload['base64'], $audio_payload['mime_type'] )
@@ -318,7 +373,7 @@ final class Audio_Converter_AI_Processor {
 			"Transcript:\n" . (string) $transcript;
 
 		$structured_builder = wp_ai_client_prompt( $prompt )
-			->using_temperature( 0.4 )
+			->using_temperature( $generation_temperature )
 			->as_json_response( $schema );
 
 		$structured_json = self::generate_text_with_retry( $structured_builder, 'generating structured draft' );
@@ -344,7 +399,7 @@ final class Audio_Converter_AI_Processor {
 				"Current draft JSON:\n" . wp_json_encode( $structured );
 
 			$expanded_builder = wp_ai_client_prompt( $expansion_prompt )
-				->using_temperature( 0.4 )
+				->using_temperature( $generation_temperature )
 				->as_json_response( $schema );
 
 			$expanded_json = self::generate_text_with_retry( $expanded_builder, 'expanding structured draft to target length' );

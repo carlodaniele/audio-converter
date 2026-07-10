@@ -1,0 +1,14 @@
+.aicb-language-controls {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.aicb-language-controls select {
+	min-width: 260px;
+}
+
+.aicb-language-refresh-link {
+	white-space: nowrap;
+}

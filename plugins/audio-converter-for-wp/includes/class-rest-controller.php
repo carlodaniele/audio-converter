@@ -5,6 +5,15 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class Audio_Converter_REST_Controller {
+	private static function count_words( string $text ): int {
+		$normalized = trim( preg_replace( '/\s+/', ' ', $text ) );
+		if ( '' === $normalized ) {
+			return 0;
+		}
+
+		return count( preg_split( '/\s+/', $normalized ) );
+	}
+
 	private static function collect_content_text( array $normalized ): string {
 		$chunks = array();
 
@@ -38,9 +47,15 @@ final class Audio_Converter_REST_Controller {
 	private static function evaluate_quality_flags( array $payload, array $normalized ): array {
 		$flags        = array();
 		$content_text = self::collect_content_text( $normalized );
+		$word_count   = self::count_words( $content_text );
 
 		if ( '' === trim( $content_text ) ) {
 			$flags[] = 'empty_content';
+		}
+
+		// Heuristic only: unusually short content can indicate low transcription quality or unintelligible audio.
+		if ( $word_count > 0 && $word_count < 80 ) {
+			$flags[] = 'audio_possibly_unintelligible';
 		}
 
 		if ( ! empty( $payload['proper_noun_hints'] ) && is_array( $payload['proper_noun_hints'] ) ) {

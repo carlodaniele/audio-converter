@@ -12,7 +12,6 @@
 	var PanelBody = wp.components.PanelBody;
 	var Notice = wp.components.Notice;
 	var SelectControl = wp.components.SelectControl;
-	var TextControl = wp.components.TextControl;
 	var TextareaControl = wp.components.TextareaControl;
 	var Spinner = wp.components.Spinner;
 	var apiFetch = wp.apiFetch;
@@ -26,7 +25,33 @@
 	};
 
 	var initialSettings = (window.AICBData && window.AICBData.settings) ? window.AICBData.settings : {};
+	var languageOptions = (window.AICBData && Array.isArray(window.AICBData.languageOptions) && window.AICBData.languageOptions.length)
+		? window.AICBData.languageOptions
+		: [{ value: "en-US", label: "English (United States)" }];
+	var hasRemoteLanguageCatalog = !!(window.AICBData && window.AICBData.hasRemoteLanguageCatalog);
 	var fieldGroupStyle = { marginBottom: "14px" };
+
+	function toBool(value, fallbackValue) {
+		if ("boolean" === typeof value) {
+			return value;
+		}
+
+		if ("number" === typeof value) {
+			return value > 0;
+		}
+
+		if ("string" === typeof value) {
+			if ("1" === value || "true" === value) {
+				return true;
+			}
+
+			if ("0" === value || "false" === value) {
+				return false;
+			}
+		}
+
+		return !!fallbackValue;
+	}
 
 	function parseHints(raw) {
 		if (!raw || "string" !== typeof raw) {
@@ -111,8 +136,10 @@
 		var _c = useState(initialSettings.default_language || "en-US"), language = _c[0], setLanguage = _c[1];
 		var _d = useState(initialSettings.default_tone || "professional"), tone = _d[0], setTone = _d[1];
 		var _e = useState(initialSettings.default_target_length || "medium"), targetLength = _e[0], setTargetLength = _e[1];
-		var _f = useState(""), hintsRaw = _f[0], setHintsRaw = _f[1];
-		var _g = useState("append"), insertionMode = _g[0], setInsertionMode = _g[1];
+		var _f = useState(initialSettings.default_proper_noun_hints || ""), hintsRaw = _f[0], setHintsRaw = _f[1];
+		var defaultInsertionMode = "replace" === initialSettings.default_insertion_mode ? "replace" : "append";
+		var _g = useState(defaultInsertionMode), insertionMode = _g[0], setInsertionMode = _g[1];
+		var autoApplyTitle = toBool(initialSettings.default_auto_apply_title, true);
 		var _h = useState(false), isLoading = _h[0], setIsLoading = _h[1];
 		var _i = useState(null), notice = _i[0], setNotice = _i[1];
 
@@ -303,6 +330,16 @@
 			setIsLoading(true);
 			setNotice(null);
 
+			var publishOptions = {
+				status: "draft",
+				post_type: "post"
+			};
+
+			var currentPostId = getCurrentPostId();
+			if (currentPostId > 0) {
+				publishOptions.target_post_id = currentPostId;
+			}
+
 			var payload = {
 				contract_version: "1.0.0",
 				external_run_id: "wp-editor-" + Date.now(),
@@ -314,11 +351,7 @@
 					target_length: targetLength
 				},
 				proper_noun_hints: parseHints(hintsRaw),
-				publish_options: {
-					status: "draft",
-					post_type: "post",
-					target_post_id: getCurrentPostId()
-				}
+				publish_options: publishOptions
 			};
 
 			requestAbilityRun(payload)
@@ -337,7 +370,9 @@
 					}
 
 					var hasInjectedBlocks = injectEditorBlocks(response.blocks || [], insertionMode);
-					applyEditorTitle(response.title);
+					if (autoApplyTitle) {
+						applyEditorTitle(response.title);
+					}
 
 					if (!hasInjectedBlocks) {
 						setNotice({ status: "warning", message: __("No blocks were inserted into the editor.", "audio-converter-for-wp") });
@@ -382,11 +417,14 @@
 				el(
 					"div",
 					{ style: fieldGroupStyle },
-					el(TextControl, {
+					el(SelectControl, {
 						label: __("Language", "audio-converter-for-wp"),
 						value: language,
+						options: languageOptions,
 						onChange: setLanguage,
-						help: __("Use a BCP-47 locale (example: en-US, it-IT).", "audio-converter-for-wp")
+						help: hasRemoteLanguageCatalog
+							? __("Choose the default output language.", "audio-converter-for-wp")
+							: __("Showing installed languages only. Remote WordPress language catalog is currently unavailable.", "audio-converter-for-wp")
 					})
 				),
 				el(
