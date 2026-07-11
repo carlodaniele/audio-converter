@@ -6,8 +6,10 @@ Ce guide est autonome et ne necessite pas de site externe.
 
 - WordPress 7.0+
 - PHP 8.0+
-- Connecteurs IA WordPress configures
+- Au moins un connecteur IA WordPress configure et actif
 - Utilisateur autorise a modifier les articles
+
+Important: sans connecteur IA actif, le plugin peut etre active mais ne peut pas generer de brouillons depuis l'audio.
 
 ## 1) Installation
 
