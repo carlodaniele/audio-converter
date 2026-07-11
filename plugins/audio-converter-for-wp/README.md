@@ -29,6 +29,8 @@ Audio Converter for WP generates a structured post draft from an audio file dire
 - `docs/free-user-guide-pl.md`
 - `docs/free-faq-pl.md`
 - `docs/wporg-screenshots-checklist-en.md`
+- `docs/wporg-screenshot-capture-runbook-en.md`
+- `docs/pro-roadmap-en.md`
 
 ## Requirements
 
@@ -41,7 +43,7 @@ Important: without an active AI connector, the plugin can be activated but canno
 
 ## Installation
 
-1. Copy `audio-converter-for-wp` into `wp-content/plugins/`.
+1. In WordPress Admin, go to Plugins > Add New and either upload the plugin ZIP (Upload Plugin) or search for the plugin in the directory.
 2. Activate the plugin from Plugins.
 3. Open Settings > Audio Converter.
 4. Save default editorial values.

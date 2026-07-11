@@ -58,3 +58,32 @@ Use this checklist before capturing and uploading screenshots for the plugin pag
 - No personal data, tokens, or internal URLs visible.
 - No spelling errors in UI labels.
 - Captions in readme.txt match actual images.
+
+## Release validation status
+
+Use this section to track what is done and what is still pending before WP.org submission.
+
+- [x] Screenshot set captured (screenshot-1/2/3.png).
+- [x] Audio format test completed: mp3.
+- [x] Audio format test completed: ogg.
+- [ ] Audio format test pending: wav.
+- [ ] Audio format test pending: m4a (native if allowed, or converted to mp3).
+- [ ] Audio format test pending: opus.
+- [ ] Audio format test pending: flac.
+- [ ] Audio format test pending: aac.
+- [ ] Audio format test pending: webm audio-only.
+
+## WP.org visual assets (outside screenshots)
+
+- [ ] Choose the image design service/workflow for WP.org visual assets.
+- [ ] Define final style direction (clean editorial, modern SaaS, or product UI-first).
+- [ ] Generate icon and banner candidates.
+- [ ] Validate branding and readability at small sizes.
+- [ ] Select final assets for SVN top-level assets folder.
+
+Suggested services to evaluate:
+
+- Midjourney (strong concept quality)
+- Ideogram (good control on text inside images)
+- Leonardo AI (many presets and fast iterations)
+- Canva/Figma (final cleanup and precise export sizing)
