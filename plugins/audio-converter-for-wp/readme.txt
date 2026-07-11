@@ -14,7 +14,7 @@ Generate a structured post draft from an audio file directly in the WordPress bl
 
 Audio Converter for WP helps editors turn audio notes into post drafts.
 
-Important prerequisite: at least one WordPress AI connector must be configured and active on the site. Without an active connector, the plugin can be activated but draft generation from audio will fail.
+Draft generation requires at least one configured WordPress AI connector. If no connector is available, the plugin can stay active but generation requests will return provider errors.
 
 Free version includes:
 
@@ -36,6 +36,13 @@ How it works:
 The plugin generates content blocks and inserts them into the current post.
 
 No external website or tutorial is required: local documentation is included in the plugin package.
+
+External services and data handling:
+
+* To generate a draft, the plugin sends the selected audio payload and selected editorial options to the configured WordPress AI connector.
+* Data processing, retention, and model behavior are managed by the active connector/provider, not by this plugin.
+* This plugin does not add its own analytics tracker or advertising pixel.
+* Site owners should review the privacy policy and terms of the selected AI connector/provider before production use.
 
 == Installation ==
 

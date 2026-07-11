@@ -5,9 +5,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class Audio_Converter_AI_Processor {
-	private const AI_MAX_RETRY_ATTEMPTS = 4;
-	private const AI_RETRY_BASE_DELAY_MICROSECONDS = 750000;
+	private const AI_MAX_RETRY_ATTEMPTS = 5;
+	private const AI_RETRY_BASE_DELAY_MICROSECONDS = 1000000;
+	private const AI_RETRY_MAX_DELAY_MICROSECONDS = 8000000;
 	private const SIGNED_URL_FETCH_TIMEOUT_SECONDS = 45;
+	private const SIGNED_URL_MAX_REDIRECTS = 2;
+	private const SIGNED_URL_MAX_RESPONSE_BYTES = 41943040;
 	private const FREE_DEFAULT_TEMPERATURE = 0.3;
 	private const MIN_TEMPERATURE          = 0.0;
 	private const MAX_TEMPERATURE          = 1.0;
@@ -24,6 +27,17 @@ final class Audio_Converter_AI_Processor {
 		}
 
 		return false !== strpos( $message, 'timed out' );
+	}
+
+	private static function retry_delay_microseconds( int $attempt ): int {
+		$exponent = max( 0, $attempt - 1 );
+		$delay    = self::AI_RETRY_BASE_DELAY_MICROSECONDS * ( 2 ** $exponent );
+		$delay    = min( $delay, self::AI_RETRY_MAX_DELAY_MICROSECONDS );
+
+		// Add a small jitter to avoid synchronized retries.
+		$jitter = random_int( 0, 300000 );
+
+		return (int) ( $delay + $jitter );
 	}
 
 	private static function generate_text_with_retry( $builder, string $stage ) {
@@ -51,7 +65,7 @@ final class Audio_Converter_AI_Processor {
 				)
 			);
 
-			usleep( self::AI_RETRY_BASE_DELAY_MICROSECONDS * $attempt );
+			usleep( self::retry_delay_microseconds( $attempt ) );
 		}
 
 		if ( $last_error instanceof WP_Error && self::is_timeout_error( $last_error ) ) {
@@ -91,10 +105,18 @@ final class Audio_Converter_AI_Processor {
 	}
 
 	private static function resolve_from_signed_url( string $signed_url ) {
-		$response = wp_remote_get(
+		$validation = self::validate_signed_url( $signed_url );
+		if ( is_wp_error( $validation ) ) {
+			return $validation;
+		}
+
+		$response = wp_safe_remote_get(
 			$signed_url,
 			array(
-				'timeout' => self::SIGNED_URL_FETCH_TIMEOUT_SECONDS,
+				'timeout'             => self::SIGNED_URL_FETCH_TIMEOUT_SECONDS,
+				'redirection'         => self::SIGNED_URL_MAX_REDIRECTS,
+				'reject_unsafe_urls'  => true,
+				'limit_response_size' => self::SIGNED_URL_MAX_RESPONSE_BYTES,
 			)
 		);
 
@@ -120,6 +142,116 @@ final class Audio_Converter_AI_Processor {
 		return array(
 			'base64'    => base64_encode( $body ),
 			'mime_type' => $mime_type,
+		);
+	}
+
+	private static function validate_signed_url( string $signed_url ) {
+		$parts = wp_parse_url( $signed_url );
+		if ( ! is_array( $parts ) || empty( $parts['scheme'] ) || empty( $parts['host'] ) ) {
+			return self::ai_error( 'invalid_input', 'signed_url must be a valid absolute URL.' );
+		}
+
+		$scheme          = strtolower( (string) $parts['scheme'] );
+		$host            = strtolower( (string) $parts['host'] );
+		$allowed_schemes = apply_filters( 'audio_converter_signed_url_allowed_schemes', array( 'https' ) );
+
+		if ( ! is_array( $allowed_schemes ) ) {
+			$allowed_schemes = array( 'https' );
+		}
+
+		$allowed_schemes = array_map( 'strtolower', array_map( 'strval', $allowed_schemes ) );
+		if ( ! in_array( $scheme, $allowed_schemes, true ) ) {
+			return self::ai_error( 'invalid_input', 'signed_url scheme is not allowed.' );
+		}
+
+		if ( isset( $parts['port'] ) ) {
+			$port = (int) $parts['port'];
+			if ( 'https' === $scheme && 443 !== $port ) {
+				return self::ai_error( 'invalid_input', 'signed_url port is not allowed for HTTPS.' );
+			}
+
+			if ( 'http' === $scheme && 80 !== $port ) {
+				return self::ai_error( 'invalid_input', 'signed_url port is not allowed for HTTP.' );
+			}
+		}
+
+		$allowlist = apply_filters( 'audio_converter_signed_url_host_allowlist', array() );
+		if ( is_array( $allowlist ) && ! empty( $allowlist ) && ! self::host_matches_allowlist( $host, $allowlist ) ) {
+			return self::ai_error( 'invalid_input', 'signed_url host is not in the allowed host list.' );
+		}
+
+		$ips = self::resolve_host_ips( $host );
+		if ( empty( $ips ) ) {
+			return self::ai_error( 'ai_provider_unavailable', 'signed_url host could not be resolved.' );
+		}
+
+		foreach ( $ips as $ip ) {
+			if ( ! self::is_public_ip( $ip ) ) {
+				return self::ai_error( 'invalid_input', 'signed_url resolves to a private or reserved IP, which is not allowed.' );
+			}
+		}
+
+		return true;
+	}
+
+	private static function host_matches_allowlist( string $host, array $allowlist ): bool {
+		$host = strtolower( trim( $host ) );
+
+		foreach ( $allowlist as $pattern ) {
+			$pattern = strtolower( trim( (string) $pattern ) );
+			if ( '' === $pattern ) {
+				continue;
+			}
+
+			if ( 0 === strpos( $pattern, '*.' ) ) {
+				$suffix = substr( $pattern, 1 );
+				if ( '' !== $suffix && str_ends_with( $host, $suffix ) ) {
+					return true;
+				}
+				continue;
+			}
+
+			if ( $host === $pattern ) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	private static function resolve_host_ips( string $host ): array {
+		$ips = array();
+
+		if ( filter_var( $host, FILTER_VALIDATE_IP ) ) {
+			return array( $host );
+		}
+
+		$ipv4 = gethostbynamel( $host );
+		if ( is_array( $ipv4 ) ) {
+			$ips = array_merge( $ips, $ipv4 );
+		}
+
+		if ( function_exists( 'dns_get_record' ) ) {
+			$aaaa = dns_get_record( $host, DNS_AAAA );
+			if ( is_array( $aaaa ) ) {
+				foreach ( $aaaa as $record ) {
+					if ( ! empty( $record['ipv6'] ) ) {
+						$ips[] = (string) $record['ipv6'];
+					}
+				}
+			}
+		}
+
+		$ips = array_values( array_unique( array_filter( $ips ) ) );
+
+		return $ips;
+	}
+
+	private static function is_public_ip( string $ip ): bool {
+		return false !== filter_var(
+			$ip,
+			FILTER_VALIDATE_IP,
+			FILTER_FLAG_NO_PRIV_RANGE | FILTER_FLAG_NO_RES_RANGE
 		);
 	}
 
