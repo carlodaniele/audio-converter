@@ -5,7 +5,7 @@
  * Version: 0.1.0
  * Requires at least: 7.0
  * Requires PHP: 8.0
- * Author: Audio Converter Team
+ * Author: Carlo Daniele
  * License: GPL-2.0-or-later
  * Text Domain: audio-converter-for-wp
  * Domain Path: /languages

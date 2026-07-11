@@ -6,8 +6,10 @@ Este guia e independente e nao precisa de site externo.
 
 - WordPress 7.0+
 - PHP 8.0+
-- Conectores de IA do WordPress configurados
+- Pelo menos um conector de IA do WordPress configurado e ativo
 - Usuario com permissao para editar posts
+
+Importante: sem um conector de IA ativo, o plugin pode ser ativado, mas nao consegue gerar rascunhos a partir de audio.
 
 ## 1) Instalacao
 

@@ -6,8 +6,10 @@ Esta guia es autonoma y no requiere un sitio web externo.
 
 - WordPress 7.0+
 - PHP 8.0+
-- Conectores de IA de WordPress configurados
+- Al menos un conector de IA de WordPress configurado y activo
 - Usuario con permisos para editar entradas
+
+Importante: sin un conector de IA activo, el plugin puede activarse pero no puede generar borradores desde audio.
 
 ## 1) Instalacion
 

@@ -34,8 +34,10 @@ Audio Converter for WP generates a structured post draft from an audio file dire
 
 - WordPress 7.0+
 - PHP 8.0+
-- WordPress AI connectors configured
+- At least one WordPress AI connector configured and active
 - User with `edit_posts` capability
+
+Important: without an active AI connector, the plugin can be activated but cannot generate drafts from audio.
 
 ## Installation
 

@@ -30,6 +30,8 @@
 		: [{ value: "en-US", label: "English (United States)" }];
 	var hasRemoteLanguageCatalog = !!(window.AICBData && window.AICBData.hasRemoteLanguageCatalog);
 	var fieldGroupStyle = { marginBottom: "14px" };
+	var MAX_AUDIO_SIZE_BYTES = 25 * 1024 * 1024;
+	var MAX_AUDIO_DURATION_SECONDS = 6 * 60;
 
 	function toBool(value, fallbackValue) {
 		if ("boolean" === typeof value) {
@@ -130,9 +132,52 @@
 		return total;
 	}
 
+	function parseDurationSeconds(value) {
+		if ("number" === typeof value && !isNaN(value)) {
+			return Math.max(0, Math.floor(value));
+		}
+
+		if ("string" !== typeof value || !value.trim()) {
+			return 0;
+		}
+
+		var parts = value.split(":").map(function (item) {
+			return parseInt(item, 10);
+		});
+
+		if (parts.some(function (n) { return isNaN(n); })) {
+			return 0;
+		}
+
+		if (parts.length === 3) {
+			return (parts[0] * 3600) + (parts[1] * 60) + parts[2];
+		}
+
+		if (parts.length === 2) {
+			return (parts[0] * 60) + parts[1];
+		}
+
+		if (parts.length === 1) {
+			return parts[0];
+		}
+
+		return 0;
+	}
+
+	function toInteger(value) {
+		var parsed = Number(value);
+		if (isNaN(parsed) || parsed <= 0) {
+			return 0;
+		}
+
+		return Math.floor(parsed);
+	}
+
 	function SidebarApp() {
 		var _a = useState(0), audioId = _a[0], setAudioId = _a[1];
 		var _b = useState(""), audioLabel = _b[0], setAudioLabel = _b[1];
+		var _b2 = useState(0), audioSizeBytes = _b2[0], setAudioSizeBytes = _b2[1];
+		var _b3 = useState(0), audioDurationSeconds = _b3[0], setAudioDurationSeconds = _b3[1];
 		var _c = useState(initialSettings.default_language || "en-US"), language = _c[0], setLanguage = _c[1];
 		var _d = useState(initialSettings.default_tone || "professional"), tone = _d[0], setTone = _d[1];
 		var _e = useState(initialSettings.default_target_length || "medium"), targetLength = _e[0], setTargetLength = _e[1];
@@ -142,6 +187,18 @@
 		var autoApplyTitle = toBool(initialSettings.default_auto_apply_title, true);
 		var _h = useState(false), isLoading = _h[0], setIsLoading = _h[1];
 		var _i = useState(null), notice = _i[0], setNotice = _i[1];
+
+		function getAudioPreflightWarning() {
+			if (audioSizeBytes > MAX_AUDIO_SIZE_BYTES) {
+				return __("Selected audio file is too large (recommended max 25 MB). Please choose a smaller file or trim it before generating.", "audio-converter-for-wp");
+			}
+
+			if (audioDurationSeconds > MAX_AUDIO_DURATION_SECONDS) {
+				return __("Selected audio is too long (recommended max 15 minutes). Please split or trim it before generating.", "audio-converter-for-wp");
+			}
+
+			return "";
+		}
 
 		function requestAbilityRun(payload) {
 			var baseRequest = {
@@ -310,6 +367,19 @@
 				var media = selection.toJSON();
 				setAudioId(media.id || 0);
 				setAudioLabel(media.title || media.filename || sprintf(__("Audio #%d", "audio-converter-for-wp"), media.id));
+
+				var sizeBytes = toInteger(media.filesizeInBytes);
+				if (!sizeBytes && media.filesize && "object" === typeof media.filesize) {
+					sizeBytes = toInteger(media.filesize.raw);
+				}
+				setAudioSizeBytes(sizeBytes);
+
+				var durationSeconds = toInteger(media.length);
+				if (!durationSeconds) {
+					durationSeconds = parseDurationSeconds(media.fileLength);
+				}
+				setAudioDurationSeconds(durationSeconds);
+
 				setNotice(null);
 			});
 
@@ -317,6 +387,12 @@
 		}
 
 		function generateFromAudio() {
+			var preflightWarning = getAudioPreflightWarning();
+			if (preflightWarning) {
+				setNotice({ status: "warning", message: preflightWarning });
+				return;
+			}
+
 			if (!window.AICBData || !window.AICBData.abilityRunPath || !window.AICBData.nonce) {
 				setNotice({ status: "error", message: __("Plugin configuration missing in editor context.", "audio-converter-for-wp") });
 				return;
@@ -409,11 +485,40 @@
 				PanelBody,
 				{ title: __("Audio source", "audio-converter-for-wp"), initialOpen: true },
 				el(Button, { variant: "secondary", onClick: openMediaLibrary }, __("Select audio from Media Library", "audio-converter-for-wp")),
-				audioLabel ? el("p", { style: { marginTop: "8px" } }, __("Selected:", "audio-converter-for-wp") + " " + audioLabel) : el("p", null, __("No audio selected", "audio-converter-for-wp"))
+				el(
+					"p",
+					{ style: { marginTop: "8px", marginBottom: "8px", color: "#757575", fontSize: "12px", lineHeight: "1.4" } },
+					__("Recommended limits: up to 6 minutes and 25 MB to reduce timeout risk.", "audio-converter-for-wp")
+				),
+				audioLabel
+					? el(
+						"p",
+						{
+							style: {
+								marginTop: "8px",
+								display: "flex",
+								alignItems: "center",
+								gap: "8px",
+								fontWeight: 600
+							}
+						},
+						el("span", {
+							"aria-hidden": true,
+							style: {
+								width: "10px",
+								height: "10px",
+								borderRadius: "999px",
+								backgroundColor: "#2fb344",
+								boxShadow: "0 0 0 2px rgba(47,179,68,0.2)"
+							}
+						}),
+						__("Selected:", "audio-converter-for-wp") + " " + audioLabel
+					)
+					: el("p", null, __("No audio selected", "audio-converter-for-wp"))
 			),
 			el(
 				PanelBody,
-				{ title: __("Editorial options", "audio-converter-for-wp"), initialOpen: true },
+				{ title: __("Editorial options", "audio-converter-for-wp"), initialOpen: false },
 				el(
 					"div",
 					{ style: fieldGroupStyle },
@@ -486,6 +591,7 @@
 			el(
 				PanelBody,
 				{ title: __("Generate", "audio-converter-for-wp"), initialOpen: true },
+				getAudioPreflightWarning() ? el(Notice, { status: "warning", isDismissible: false }, getAudioPreflightWarning()) : null,
 				el(
 					"p",
 					{ style: { marginTop: 0, marginBottom: "8px", color: "#50575e" } },
@@ -495,7 +601,7 @@
 					Button,
 					{
 						variant: "primary",
-						disabled: isLoading || !audioId,
+						disabled: isLoading || !audioId || !!getAudioPreflightWarning(),
 						onClick: generateFromAudio,
 						style: { width: "100%", justifyContent: "center" }
 					},

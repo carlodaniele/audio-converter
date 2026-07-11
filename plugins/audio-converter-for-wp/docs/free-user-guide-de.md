@@ -6,8 +6,10 @@ Diese Anleitung ist eigenstaendig und benoetigt keine externe Website.
 
 - WordPress 7.0+
 - PHP 8.0+
-- Konfigurierte WordPress-AI-Connectoren
+- Mindestens ein konfigurierter und aktiver WordPress-AI-Connector
 - Benutzer mit Berechtigung zum Bearbeiten von Beitraegen
+
+Wichtig: Ohne aktiven AI-Connector kann das Plugin aktiviert werden, aber keine Entwuerfe aus Audio generieren.
 
 ## 1) Installation
 

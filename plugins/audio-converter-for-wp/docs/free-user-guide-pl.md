@@ -6,8 +6,10 @@ Ten przewodnik jest samowystarczalny i nie wymaga zewnetrznej strony.
 
 - WordPress 7.0+
 - PHP 8.0+
-- Skonfigurowane konektory AI WordPress
+- Co najmniej jeden skonfigurowany i aktywny konektor AI WordPress
 - Uzytkownik z uprawnieniami do edycji wpisow
+
+Wazne: bez aktywnego konektora AI wtyczka moze byc aktywna, ale nie wygeneruje szkicow z audio.
 
 ## 1) Instalacja
 

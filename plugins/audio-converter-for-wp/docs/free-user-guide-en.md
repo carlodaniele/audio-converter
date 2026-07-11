@@ -6,8 +6,10 @@ This guide is self-contained and does not require an external website.
 
 - WordPress 7.0+
 - PHP 8.0+
-- WordPress AI connectors configured
+- At least one WordPress AI connector configured and active
 - User role with post editing capability
+
+Important: without an active AI connector, the plugin can be activated but cannot generate drafts from audio.
 
 ## 1) Installation
 

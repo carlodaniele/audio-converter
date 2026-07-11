@@ -6,8 +6,10 @@ Questa guida e' pensata per essere usata senza sito di supporto esterno.
 
 - WordPress 7.0+
 - PHP 8.0+
-- AI Connectors configurati su WordPress
+- Almeno un AI Connector WordPress configurato e attivo
 - Utente con permesso di modifica articoli
+
+Importante: senza un connettore AI attivo il plugin si attiva, ma non puo' generare bozze da audio.
 
 ## 1) Installazione
 

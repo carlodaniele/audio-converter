@@ -5,7 +5,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class Audio_Converter_AI_Processor {
-	private const AI_MAX_RETRY_ATTEMPTS = 2;
+	private const AI_MAX_RETRY_ATTEMPTS = 4;
+	private const AI_RETRY_BASE_DELAY_MICROSECONDS = 750000;
+	private const SIGNED_URL_FETCH_TIMEOUT_SECONDS = 45;
 	private const FREE_DEFAULT_TEMPERATURE = 0.3;
 	private const MIN_TEMPERATURE          = 0.0;
 	private const MAX_TEMPERATURE          = 1.0;
@@ -49,7 +51,7 @@ final class Audio_Converter_AI_Processor {
 				)
 			);
 
-			usleep( 350000 );
+			usleep( self::AI_RETRY_BASE_DELAY_MICROSECONDS * $attempt );
 		}
 
 		if ( $last_error instanceof WP_Error && self::is_timeout_error( $last_error ) ) {
@@ -92,7 +94,7 @@ final class Audio_Converter_AI_Processor {
 		$response = wp_remote_get(
 			$signed_url,
 			array(
-				'timeout' => 20,
+				'timeout' => self::SIGNED_URL_FETCH_TIMEOUT_SECONDS,
 			)
 		);
 
