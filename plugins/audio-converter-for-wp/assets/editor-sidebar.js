@@ -225,19 +225,14 @@
 			}
 
 			var primaryPath = window.AICBData.abilityRunPath;
-			var altPath = window.AICBData.abilityRunPathAlt;
 			var wrappedPayload = { input: payload };
 
 			return call(primaryPath, wrappedPayload)
 				.catch(function (error) {
-					if (isNoRoute(error) && altPath) {
-						return call(altPath, wrappedPayload);
-					}
-
 					return call(primaryPath, payload)
 						.catch(function (directPrimaryError) {
-							if (isNoRoute(directPrimaryError) && altPath) {
-								return call(altPath, payload);
+							if (isNoRoute(error) || isNoRoute(directPrimaryError)) {
+								throw new Error(__("Ability endpoint route not found. Ensure WordPress Abilities API is available and plugin routes are registered.", "audio-converter-for-wp"));
 							}
 
 							throw directPrimaryError;

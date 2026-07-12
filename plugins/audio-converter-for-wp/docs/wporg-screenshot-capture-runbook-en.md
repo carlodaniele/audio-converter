@@ -9,6 +9,8 @@ Create these files in local order:
 1. screenshot-1.png
 2. screenshot-2.png
 3. screenshot-3.png
+4. screenshot-4.png
+5. screenshot-5.png
 
 ## One-time setup
 
@@ -76,9 +78,37 @@ Framing:
 
 Save as: screenshot-3.png
 
+### Screenshot 4 - Media Library modal
+
+Path: Block Editor sidebar -> Select audio -> Media Library modal
+
+Required visible elements:
+- Media Library modal open
+- Audio item(s) visible with clear filename/type
+- Selection action visible
+
+Framing:
+- Keep only relevant media metadata visible.
+- Avoid personal filenames if they are sensitive.
+
+Save as: screenshot-4.png
+
+### Screenshot 5 - Error message state
+
+Path: Same sidebar, captured during a provider/runtime failure
+
+Required visible elements:
+- Error message block visible in sidebar
+- Message text readable (helpful for troubleshooting)
+
+Framing:
+- No API keys, token values, account IDs, or private URLs.
+
+Save as: screenshot-5.png
+
 ## Final QA before upload
 
-1. File order and names are exact (screenshot-1/2/3.png).
+1. File order and names are exact (screenshot-1/2/3/4/5.png).
 2. Captions in readme.txt match the images.
 3. Resolution and aspect ratio are consistent.
 4. No privacy leaks or internal identifiers.

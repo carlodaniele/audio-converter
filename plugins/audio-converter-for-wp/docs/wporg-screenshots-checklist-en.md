@@ -7,6 +7,8 @@ Use this checklist before capturing and uploading screenshots for the plugin pag
 1. Settings page (Free defaults only)
 2. Gutenberg sidebar (audio selected, ready to generate)
 3. Editor result (generated blocks inserted in current post)
+4. Media Library modal during audio selection
+5. Error message state in sidebar (provider/runtime example)
 
 ## Capture setup
 
@@ -25,6 +27,8 @@ Use this checklist before capturing and uploading screenshots for the plugin pag
   - screenshot-1.png
   - screenshot-2.png
   - screenshot-3.png
+  - screenshot-4.png
+  - screenshot-5.png
 
 ## What each screenshot should show
 
@@ -52,6 +56,18 @@ Use this checklist before capturing and uploading screenshots for the plugin pag
 - Include heading + paragraphs + list blocks to demonstrate output quality.
 - Keep content readable at normal plugin page scale.
 
+### Screenshot 4 - Media Library audio selection
+
+- Open the Media Library picker from the plugin sidebar.
+- Show at least one audio item with clear file name and type.
+- Keep personal media names hidden if needed.
+
+### Screenshot 5 - Error message state
+
+- Capture the sidebar error shown when no AI connector is configured/available.
+- Keep the message readable and actionable.
+- Avoid exposing secrets, tokens, account IDs, or private URLs.
+
 ## Final verification before upload
 
 - Screenshot order matches descriptions in readme.txt.
@@ -63,7 +79,7 @@ Use this checklist before capturing and uploading screenshots for the plugin pag
 
 Use this section to track what is done and what is still pending before WP.org submission.
 
-- [x] Screenshot set captured (screenshot-1/2/3.png).
+- [x] Screenshot set captured (screenshot-1/2/3/4/5.png).
 - [x] Audio format test completed: mp3.
 - [x] Audio format test completed: ogg.
 - [ ] Audio format test pending: wav.
