@@ -86,6 +86,8 @@ Check that WordPress AI connectors are correctly configured and available.
 1. Settings page with Free editorial defaults (language, tone, target length, insertion mode).
 2. Gutenberg sidebar with selected audio and Generate draft action.
 3. Current post updated with generated Gutenberg blocks (heading, paragraphs, list).
+4. Media Library modal used to pick the audio file before generation.
+5. Error message shown in the sidebar when no AI connector is configured/available.
 
 == Changelog ==
 

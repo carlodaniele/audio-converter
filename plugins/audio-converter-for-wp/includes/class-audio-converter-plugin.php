@@ -6,8 +6,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 final class Audio_Converter_Plugin {
 	const ABILITY_NAME                    = 'audio-converter-for-wp/audio-to-post';
-	const ABILITY_RUN_PATH                = '/wp-abilities/v1/audio-converter-for-wp/audio-to-post/run';
-	const ABILITY_RUN_PATH_ALT            = '/wp-abilities/v1/abilities/audio-converter-for-wp/audio-to-post/run';
+	const ABILITY_RUN_PATH                = '/wp-abilities/v1/abilities/audio-converter-for-wp/audio-to-post/run';
 	const OPTION_KEY                      = 'aicb_settings';
 
 	public static function init(): void {
@@ -522,7 +521,6 @@ final class Audio_Converter_Plugin {
 			'AICBData',
 			array(
 				'abilityRunPath'    => self::ABILITY_RUN_PATH,
-				'abilityRunPathAlt' => self::ABILITY_RUN_PATH_ALT,
 				'nonce'             => wp_create_nonce( 'wp_rest' ),
 				'settings'          => $settings,
 				'languageOptions'   => self::language_options_for_js(),
