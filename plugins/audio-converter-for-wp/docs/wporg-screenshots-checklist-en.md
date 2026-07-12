@@ -82,12 +82,12 @@ Use this section to track what is done and what is still pending before WP.org s
 - [x] Screenshot set captured (screenshot-1/2/3/4/5.png).
 - [x] Audio format test completed: mp3.
 - [x] Audio format test completed: ogg.
-- [ ] Audio format test pending: wav.
-- [ ] Audio format test pending: m4a (native if allowed, or converted to mp3).
-- [ ] Audio format test pending: opus.
-- [ ] Audio format test pending: flac.
-- [ ] Audio format test pending: aac.
-- [ ] Audio format test pending: webm audio-only.
+- [x] Audio format test completed: wav.
+- [x] Audio format test completed: m4a.
+- [x] Audio format test completed: flac.
+- [x] Audio format test completed: aac.
+- [ ] Out of Free v1 support for now: opus (WP server processing issue).
+- [ ] Out of Free v1 support for now: webm audio-only (not selectable in current media picker flow).
 
 ## WP.org visual assets (outside screenshots)
 

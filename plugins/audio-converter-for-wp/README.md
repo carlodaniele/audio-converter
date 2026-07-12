@@ -40,6 +40,15 @@ Audio Converter for WP generates a structured post draft from an audio file dire
 - At least one WordPress AI connector configured and active
 - User with `edit_posts` capability
 
+## Supported audio files (Free v1)
+
+- MP3
+- OGG
+- WAV
+- M4A
+- AAC
+- FLAC
+
 Important: without an active AI connector, the plugin can be activated but cannot generate drafts from audio.
 
 ## Installation

@@ -482,6 +482,11 @@
 				el(Button, { variant: "secondary", onClick: openMediaLibrary }, __("Select audio from Media Library", "audio-converter-for-wp")),
 				el(
 					"p",
+					{ style: { marginTop: "8px", marginBottom: "8px", color: "#50575e", fontSize: "12px", lineHeight: "1.4" } },
+					__("Supported files: MP3, OGG, WAV, M4A, AAC, FLAC.", "audio-converter-for-wp")
+				),
+				el(
+					"p",
 					{ style: { marginTop: "8px", marginBottom: "8px", color: "#757575", fontSize: "12px", lineHeight: "1.4" } },
 					__("Recommended limits: up to 6 minutes and 25 MB to reduce timeout risk.", "audio-converter-for-wp")
 				),

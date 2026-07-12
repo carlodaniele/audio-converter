@@ -19,6 +19,7 @@ Draft generation requires at least one configured WordPress AI connector. If no 
 Free version includes:
 
 * Audio selection from Media Library
+* Supported file types: MP3, OGG, WAV, M4A, AAC, FLAC
 * Draft generation from audio (AI pipeline)
 * Language, tone, and target length defaults
 * Proper noun hints
