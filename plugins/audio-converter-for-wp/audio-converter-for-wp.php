@@ -26,4 +26,6 @@ require_once __DIR__ . '/includes/class-observability.php';
 require_once __DIR__ . '/includes/class-rest-controller.php';
 require_once __DIR__ . '/includes/class-audio-converter-plugin.php';
 
+register_activation_hook( __FILE__, array( 'Audio_Converter_Job_Store', 'install' ) );
+
 Audio_Converter_Plugin::init();

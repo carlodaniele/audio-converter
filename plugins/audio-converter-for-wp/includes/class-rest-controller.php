@@ -87,6 +87,10 @@ final class Audio_Converter_REST_Controller {
 			$payload = $payload['input'];
 		}
 
+		if ( ! current_user_can( 'edit_posts' ) ) {
+			return Audio_Converter_Ability_Contract::error_response( 'unauthorized', 'You are not allowed to execute this ability.' );
+		}
+
 		if ( ! is_array( $payload ) ) {
 			return Audio_Converter_Ability_Contract::error_response( 'invalid_input', 'Request body must be a JSON object.' );
 		}

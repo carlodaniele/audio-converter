@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class Audio_Converter_AI_Processor {
-	private const AI_MAX_RETRY_ATTEMPTS = 5;
+	private const AI_MAX_RETRY_ATTEMPTS = 3;
 	private const AI_RETRY_BASE_DELAY_MICROSECONDS = 1000000;
 	private const AI_RETRY_MAX_DELAY_MICROSECONDS = 8000000;
 	private const SIGNED_URL_FETCH_TIMEOUT_SECONDS = 45;
@@ -29,6 +29,33 @@ final class Audio_Converter_AI_Processor {
 		return false !== strpos( $message, 'timed out' );
 	}
 
+	private static function retryable_error_reason( WP_Error $error ): string {
+		$code    = strtolower( (string) $error->get_error_code() );
+		$message = strtolower( $error->get_error_message() );
+
+		if ( self::is_timeout_error( $error ) ) {
+			return 'timeout';
+		}
+
+		if ( false !== strpos( $code, 'rate_limit' ) || false !== strpos( $message, 'rate limit' ) || false !== strpos( $message, '429' ) ) {
+			return 'rate_limit';
+		}
+
+		if ( false !== strpos( $message, '503' ) || false !== strpos( $message, 'service unavailable' ) || false !== strpos( $message, 'temporarily unavailable' ) ) {
+			return 'service_unavailable';
+		}
+
+		if ( false !== strpos( $message, '502' ) || false !== strpos( $message, 'bad gateway' ) ) {
+			return 'bad_gateway';
+		}
+
+		if ( false !== strpos( $message, '504' ) || false !== strpos( $message, 'gateway timeout' ) ) {
+			return 'gateway_timeout';
+		}
+
+		return '';
+	}
+
 	private static function retry_delay_microseconds( int $attempt ): int {
 		$exponent = max( 0, $attempt - 1 );
 		$delay    = self::AI_RETRY_BASE_DELAY_MICROSECONDS * ( 2 ** $exponent );
@@ -40,38 +67,53 @@ final class Audio_Converter_AI_Processor {
 		return (int) ( $delay + $jitter );
 	}
 
-	private static function generate_text_with_retry( $builder, string $stage ) {
+	private static function generate_text_with_retry( $builder, string $stage, array $context = array() ) {
 		$last_error = null;
+		$last_retryable_reason = '';
 
 		for ( $attempt = 1; $attempt <= self::AI_MAX_RETRY_ATTEMPTS; $attempt++ ) {
-			$result = $builder->generate_text();
+			$attempt_context = array_merge(
+				$context,
+				array(
+					'stage'        => $stage,
+					'attempt'      => $attempt,
+					'max_attempts' => self::AI_MAX_RETRY_ATTEMPTS,
+				)
+			);
+
+			$forced_result = apply_filters( 'audio_converter_ai_retry_fault_injection_error', null, $attempt_context );
+			$result        = $forced_result instanceof WP_Error ? $forced_result : $builder->generate_text();
 
 			if ( ! is_wp_error( $result ) ) {
 				return $result;
 			}
 
 			$last_error = $result;
+			$retryable_reason = self::retryable_error_reason( $result );
+			$last_retryable_reason = $retryable_reason;
 
-			if ( ! self::is_timeout_error( $result ) || $attempt >= self::AI_MAX_RETRY_ATTEMPTS ) {
+			if ( '' === $retryable_reason || $attempt >= self::AI_MAX_RETRY_ATTEMPTS ) {
 				break;
 			}
 
 			Audio_Converter_Observability::log_event(
-				'ai_timeout_retry',
-				array(
-					'stage'   => $stage,
-					'attempt' => $attempt,
-					'error'   => $result->get_error_message(),
+				'ai_retry_attempt',
+				array_merge(
+					$attempt_context,
+					array(
+						'retryable_reason' => $retryable_reason,
+						'error'            => $result->get_error_message(),
+					)
 				)
 			);
 
 			usleep( self::retry_delay_microseconds( $attempt ) );
 		}
 
-		if ( $last_error instanceof WP_Error && self::is_timeout_error( $last_error ) ) {
+		if ( $last_error instanceof WP_Error && '' !== $last_retryable_reason ) {
 			return self::ai_error(
 				'ai_provider_unavailable',
-				'AI provider timeout while ' . $stage . '. Please retry in a few seconds.'
+				'AI provider temporarily unavailable while ' . $stage . '. Please retry in a few seconds.'
 			);
 		}
 
@@ -468,7 +510,12 @@ final class Audio_Converter_AI_Processor {
 			return self::ai_error( 'ai_provider_unavailable', 'No configured AI model supports this audio transcription request.' );
 		}
 
-		$transcript = self::generate_text_with_retry( $transcription_builder, 'transcribing audio' );
+		$retry_context = array(
+			'external_run_id' => isset( $payload['external_run_id'] ) ? (string) $payload['external_run_id'] : '',
+			'source'          => isset( $payload['source'] ) ? (string) $payload['source'] : '',
+		);
+
+		$transcript = self::generate_text_with_retry( $transcription_builder, 'transcribing audio', $retry_context );
 		if ( is_wp_error( $transcript ) ) {
 			return $transcript;
 		}
@@ -510,7 +557,7 @@ final class Audio_Converter_AI_Processor {
 			->using_temperature( $generation_temperature )
 			->as_json_response( $schema );
 
-		$structured_json = self::generate_text_with_retry( $structured_builder, 'generating structured draft' );
+		$structured_json = self::generate_text_with_retry( $structured_builder, 'generating structured draft', $retry_context );
 
 		if ( is_wp_error( $structured_json ) ) {
 			return $structured_json;
@@ -536,7 +583,7 @@ final class Audio_Converter_AI_Processor {
 				->using_temperature( $generation_temperature )
 				->as_json_response( $schema );
 
-			$expanded_json = self::generate_text_with_retry( $expanded_builder, 'expanding structured draft to target length' );
+			$expanded_json = self::generate_text_with_retry( $expanded_builder, 'expanding structured draft to target length', $retry_context );
 			if ( ! is_wp_error( $expanded_json ) ) {
 				$expanded_structured = self::decode_structured_json( $expanded_json );
 				if ( ! is_wp_error( $expanded_structured ) ) {
