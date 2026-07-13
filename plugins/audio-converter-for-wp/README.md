@@ -31,6 +31,8 @@ Audio Converter for WP generates a structured post draft from an audio file dire
 - `docs/wporg-screenshots-checklist-en.md`
 - `docs/wporg-screenshot-capture-runbook-en.md`
 - `docs/api-endpoint-test-evidence-en.md`
+- `docs/uninstall-data-cleanup-runbook-en.md`
+- `docs/retry-fault-injection-runbook-en.md`
 - `docs/pro-roadmap-en.md`
 
 ## Requirements
@@ -72,11 +74,23 @@ The plugin inserts generated Gutenberg blocks into the current post.
 
 - Canonical (Abilities API): `/wp-json/wp-abilities/v1/abilities/audio-converter-for-wp/audio-to-post/run`
 
-## API endpoint tests (planned)
+## API endpoint tests (completed)
 
 - [x] Verify canonical endpoint returns successful run output for a valid request.
 - [x] Verify response includes expected contract fields (run_id, status, quality_flags, processing_timestamps, debug_reference_id).
 - [x] Verify invalid payload returns expected validation error.
+
+Recommended script for replay/idempotency validation:
+
+- `scripts/phase3/test-idempotency-replay.sh`
+
+Recommended script for unauthorized access validation:
+
+- `scripts/phase3/test-unauthorized-access.sh`
+
+Recommended script for retry fault-injection validation:
+
+- `scripts/phase3/test-retry-fault-429.sh`
 
 ## i18n
 
