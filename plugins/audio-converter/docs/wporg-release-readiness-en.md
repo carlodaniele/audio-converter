@@ -41,9 +41,16 @@ cd /Users/carlo/Documents/audio-converter
 
 ## 5. Submission handoff
 
-- [ ] Upload plugin package to WordPress.org flow.
+- [x] Upload plugin package to WordPress.org flow.
 - [ ] Upload top-level visual assets to WP.org SVN assets folder.
 - [ ] Run final manual review on rendered plugin page.
+
+Submission log (2026-07-19):
+
+- Submitted zip: `audio-converter-0.1.0.zip`
+- Assigned initial slug: `audio-converter`
+- Automated scan result: `Pass`
+- Review status: `Awaiting Review`
 
 Handoff reference:
 
