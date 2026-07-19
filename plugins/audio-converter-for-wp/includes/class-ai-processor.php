@@ -70,8 +70,10 @@ final class Audio_Converter_AI_Processor {
 	private static function generate_text_with_retry( $builder, string $stage, array $context = array() ) {
 		$last_error = null;
 		$last_retryable_reason = '';
+		$attempts_used = 0;
 
 		for ( $attempt = 1; $attempt <= self::AI_MAX_RETRY_ATTEMPTS; $attempt++ ) {
+			$attempts_used = $attempt;
 			$attempt_context = array_merge(
 				$context,
 				array(
@@ -101,6 +103,7 @@ final class Audio_Converter_AI_Processor {
 				array_merge(
 					$attempt_context,
 					array(
+						'error_code'       => (string) $result->get_error_code(),
 						'retryable_reason' => $retryable_reason,
 						'error'            => $result->get_error_message(),
 					)
@@ -111,6 +114,21 @@ final class Audio_Converter_AI_Processor {
 		}
 
 		if ( $last_error instanceof WP_Error && '' !== $last_retryable_reason ) {
+			Audio_Converter_Observability::log_event(
+				'ai_retry_exhausted',
+				array_merge(
+					$context,
+					array(
+						'stage'            => $stage,
+						'attempt'          => $attempts_used,
+						'max_attempts'     => self::AI_MAX_RETRY_ATTEMPTS,
+						'error_code'       => (string) $last_error->get_error_code(),
+						'retryable_reason' => $last_retryable_reason,
+						'error'            => $last_error->get_error_message(),
+					)
+				)
+			);
+
 			return self::ai_error(
 				'ai_provider_unavailable',
 				'AI provider temporarily unavailable while ' . $stage . '. Please retry in a few seconds.'
@@ -118,6 +136,20 @@ final class Audio_Converter_AI_Processor {
 		}
 
 		if ( $last_error instanceof WP_Error ) {
+			Audio_Converter_Observability::log_event(
+				'ai_non_retryable_error',
+				array_merge(
+					$context,
+					array(
+						'stage'        => $stage,
+						'attempt'      => $attempts_used,
+						'max_attempts' => self::AI_MAX_RETRY_ATTEMPTS,
+						'error_code'   => (string) $last_error->get_error_code(),
+						'error'        => $last_error->get_error_message(),
+					)
+				)
+			);
+
 			return self::ai_error( 'ai_provider_unavailable', $last_error->get_error_message() );
 		}
 
