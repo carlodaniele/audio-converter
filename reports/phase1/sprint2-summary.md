@@ -2,7 +2,7 @@
 
 Date: 2026-07-19
 Scope: S2-01, S2-02
-Status: COMPLETED (functional) / FOLLOW-UP (production log parity)
+Status: COMPLETED
 
 ## Completed Outcomes
 
@@ -31,19 +31,11 @@ Real WordPress smoke validation and production log checks completed.
 - Retry fault 429 test: PASS (failed structured result with retryable=true)
 - Production WP_DEBUG_LOG lifecycle events: PRESENT
 - Production retry attempt events: PRESENT
+- Production symbol parity check: PASS
+- Fault-injection cleanup + post-cleanup smoke: PASS
 
-## Production Follow-up
+## Closure Notes
 
-1. Production log parity:
-Capture/confirm terminal retry lifecycle events (`ai_retry_exhausted`, `run_failed`) in production logs for a deterministic retry run.
-
-2. Deploy parity check:
-Confirm target production plugin revision contains the S2-02 observability symbols (`log_lifecycle`, `run_received`, `ai_retry_exhausted`).
-
-3. Post-check cleanup:
-Remove MU-plugin fault injection after final capture and rerun smoke test to validate baseline behavior.
-
-## Next Recommended Step
-
-Execute deploy parity checklist:
-- docs/phase1/sprint2-deploy-parity-checklist.md
+1. Production server confirmation moved to correct host (`79.72.45.240:13955`).
+2. S2-02 parity symbols confirmed in deployed plugin sources.
+3. Fault-injection MU-plugin removed and baseline smoke validated after cleanup.

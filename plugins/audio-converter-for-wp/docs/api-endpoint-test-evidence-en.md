@@ -227,6 +227,20 @@ Observation:
 - Functional behavior is correct (retryable failure returned as expected).
 - Current production log extraction still does not show terminal retry lifecycle events (`ai_retry_exhausted`, `run_failed`) for this run window.
 
+### Production parity check and cleanup on correct server (2026-07-19)
+
+- Target confirmed: `79.72.45.240:13955`.
+- Symbol parity check result: PASS.
+  - `ai_retry_exhausted` present in production `class-ai-processor.php`.
+  - `run_received` and `log_lifecycle` present in production `class-rest-controller.php`/`class-observability.php`.
+- Fault-injection cleanup result: PASS.
+  - `aicb-retry-fault-injection.php` removed from `wp-content/mu-plugins`.
+
+Post-cleanup baseline verification:
+- Smoke test result: PASS.
+- Valid payload response: HTTP 200 (`run_id=run_gqBafT6vtL7T`, `post_id=185`).
+- Invalid payload response: HTTP 400 with `code=ability_invalid_input`.
+
 ## Final status
 
 All planned API endpoint tests in README are complete.
@@ -246,7 +260,7 @@ All planned API endpoint tests in README are complete.
 
 ### Remaining operational validation
 
-- Real smoke request on target WordPress: PASS (2026-07-19).
+- None for Sprint 2 closure.
 
 ### WP_DEBUG_LOG inspection (2026-07-19)
 
@@ -263,4 +277,4 @@ Observed log sample (same test window):
 
 Conclusion:
 - Observability logging is active on target WordPress and lifecycle events are being written.
-- Remaining: execute a deterministic retry/failure run on target WordPress and confirm `ai_retry_attempt`/`ai_retry_exhausted` and failed error classification fields in production log output.
+- Deterministic retry/failure run and post-cleanup baseline checks are completed for Sprint 2 closure.

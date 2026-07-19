@@ -2,7 +2,7 @@
 
 Date: 2026-07-13
 Owner: Carlo Daniele
-Status: IN PROGRESS
+Status: COMPLETED
 
 ## Progress Update
 
@@ -26,6 +26,12 @@ Status: IN PROGRESS
 - Evidence: `/www/audioconverter_259/public/wp-content/debug.log` filtered output (lines 9-12 in current extraction)
 - 2026-07-19: production retry fault test PASS with failed response (`run_gMsXqfm9O3Gb`, `ai_provider_unavailable`, `retryable=true`) and retry attempts logged for `retry429-1784464281`.
 - Evidence: scripts/phase3/test-retry-fault-429.sh output + production debug.log extraction
+- 2026-07-19: production symbol parity confirmed on correct server (`79.72.45.240:13955`) for `ai_retry_exhausted`, `run_received`, `log_lifecycle`.
+- Evidence: grep output on production plugin files (class-ai-processor.php, class-rest-controller.php, class-observability.php)
+- 2026-07-19: fault-injection MU-plugin removed from production (`aicb-retry-fault-injection.php` no longer present).
+- Evidence: `ls -l /www/audioconverter_259/public/wp-content/mu-plugins`
+- 2026-07-19: post-cleanup baseline smoke test passed on canonical endpoint (valid + invalid payload checks).
+- Evidence: scripts/phase3/smoke-test.sh output (`run_gqBafT6vtL7T`, HTTP 200 valid, HTTP 400 invalid)
 
 ## Scope
 
@@ -59,7 +65,7 @@ Definition of Done (testable):
 ### S2-02 - Observability metrics and run lifecycle visibility
 
 Status:
-- COMPLETED (functional) / FOLLOW-UP (production log parity)
+- COMPLETED
 
 Objective:
 Expose clearer operational signals for run lifecycle and retry decisions.
@@ -86,7 +92,8 @@ Progress notes:
 - Real smoke run completed and PASS.
 - WP_DEBUG_LOG inspection completed: lifecycle logging confirmed on target WordPress.
 - Functional DoD validated: retryable failure behavior and retry telemetry observed on target environment.
-- Follow-up: align/deploy production logging revision so terminal events (`ai_retry_exhausted`, `run_failed`) and enriched retry context are visible in production log output.
+- Production code parity validated on target server.
+- Post-cleanup baseline behavior validated via smoke PASS.
 
 ## Execution Order
 
