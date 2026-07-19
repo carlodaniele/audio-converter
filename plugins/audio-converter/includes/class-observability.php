@@ -39,6 +39,7 @@ final class Audio_Converter_Observability {
 			return;
 		}
 
+		// phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log -- runtime observability is intentionally written only when WP_DEBUG_LOG is enabled.
 		error_log(
 			wp_json_encode(
 				array(

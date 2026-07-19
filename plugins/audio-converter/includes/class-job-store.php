@@ -50,6 +50,7 @@ final class Audio_Converter_Job_Store {
 		global $wpdb;
 
 		$table_name = self::table_name();
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- required for runtime table existence check.
 		$found      = $wpdb->get_var( $wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name ) );
 
 		return is_string( $found ) && $table_name === $found;
@@ -124,6 +125,7 @@ final class Audio_Converter_Job_Store {
 		global $wpdb;
 
 		$table_name = self::table_name();
+		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and query is prepared for value placeholders.
 		$existing   = $wpdb->get_var(
 			$wpdb->prepare(
 				"SELECT run_id FROM {$table_name} WHERE external_run_id = %s LIMIT 1",
@@ -143,6 +145,7 @@ final class Audio_Converter_Job_Store {
 		$now    = self::now_mysql_utc();
 		$base   = Audio_Converter_Ability_Contract::base_response( $run_id, 'pending' );
 
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery -- plugin-owned runtime table insert.
 		$inserted = $wpdb->insert(
 			$table_name,
 			array(
@@ -159,6 +162,7 @@ final class Audio_Converter_Job_Store {
 		);
 
 		if ( false === $inserted ) {
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and query is prepared for value placeholders.
 			$existing_after_race = $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT run_id FROM {$table_name} WHERE external_run_id = %s LIMIT 1",
@@ -187,6 +191,7 @@ final class Audio_Converter_Job_Store {
 			global $wpdb;
 
 			$table_name = self::table_name();
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and query is prepared for value placeholders.
 			$status     = $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT status FROM {$table_name} WHERE run_id = %s LIMIT 1",
@@ -213,6 +218,7 @@ final class Audio_Converter_Job_Store {
 			global $wpdb;
 
 			$table_name = self::table_name();
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- plugin-owned runtime table update.
 			$wpdb->update(
 				$table_name,
 				array(
@@ -251,6 +257,7 @@ final class Audio_Converter_Job_Store {
 			$table_name = self::table_name();
 			$now        = self::now_mysql_utc();
 
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- plugin-owned runtime table update.
 			$wpdb->update(
 				$table_name,
 				array(
@@ -281,6 +288,7 @@ final class Audio_Converter_Job_Store {
 			global $wpdb;
 
 			$table_name = self::table_name();
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- plugin-owned runtime table update.
 			$wpdb->update(
 				$table_name,
 				array(
@@ -307,6 +315,7 @@ final class Audio_Converter_Job_Store {
 			global $wpdb;
 
 			$table_name     = self::table_name();
+			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and query is prepared for value placeholders.
 			$response_json  = $wpdb->get_var(
 				$wpdb->prepare(
 					"SELECT response_json FROM {$table_name} WHERE run_id = %s LIMIT 1",

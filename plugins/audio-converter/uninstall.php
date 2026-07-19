@@ -10,10 +10,11 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 /**
  * Remove plugin settings and transient rows for the current site.
  */
-function aicb_cleanup_current_site_data(): void {
+function audio_converter_cleanup_current_site_data(): void {
 	global $wpdb;
 
 	delete_option( 'aicb_settings' );
+	// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching,WordPress.DB.DirectDatabaseQuery.SchemaChange -- uninstall intentionally removes plugin-owned table.
 	$wpdb->query( "DROP TABLE IF EXISTS {$wpdb->prefix}aicb_runs" );
 
 	$transient_patterns = array(
@@ -22,6 +23,7 @@ function aicb_cleanup_current_site_data(): void {
 	);
 
 	foreach ( $transient_patterns as $pattern ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- uninstall intentionally removes plugin-owned transient rows.
 		$wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
@@ -34,7 +36,7 @@ function aicb_cleanup_current_site_data(): void {
 /**
  * Remove network-level transient rows (defensive cleanup for multisite).
  */
-function aicb_cleanup_network_transients(): void {
+function audio_converter_cleanup_network_transients(): void {
 	global $wpdb;
 
 	if ( ! isset( $wpdb->sitemeta ) ) {
@@ -47,6 +49,7 @@ function aicb_cleanup_network_transients(): void {
 	);
 
 	foreach ( $site_transient_patterns as $pattern ) {
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- uninstall intentionally removes plugin-owned network transient rows.
 		$wpdb->query(
 			$wpdb->prepare(
 				"DELETE FROM {$wpdb->sitemeta} WHERE meta_key LIKE %s",
@@ -57,23 +60,23 @@ function aicb_cleanup_network_transients(): void {
 }
 
 if ( is_multisite() ) {
-	$site_ids = get_sites(
+	$audio_converter_site_ids = get_sites(
 		array(
 			'fields' => 'ids',
 		)
 	);
 
-	$current_blog_id = get_current_blog_id();
+	$audio_converter_current_blog_id = get_current_blog_id();
 
-	foreach ( $site_ids as $site_id ) {
-		switch_to_blog( (int) $site_id );
-		aicb_cleanup_current_site_data();
+	foreach ( $audio_converter_site_ids as $audio_converter_site_id ) {
+		switch_to_blog( (int) $audio_converter_site_id );
+		audio_converter_cleanup_current_site_data();
 		restore_current_blog();
 	}
 
-	switch_to_blog( (int) $current_blog_id );
-	aicb_cleanup_network_transients();
+	switch_to_blog( (int) $audio_converter_current_blog_id );
+	audio_converter_cleanup_network_transients();
 	restore_current_blog();
 } else {
-	aicb_cleanup_current_site_data();
+	audio_converter_cleanup_current_site_data();
 }
