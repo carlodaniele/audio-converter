@@ -93,9 +93,9 @@ Use this section to track what is done and what is still pending before WP.org s
 
 - [x] Choose the image design service/workflow for WP.org visual assets.
 - [x] Define final style direction (clean editorial, modern SaaS, or product UI-first).
-- [ ] Generate icon and banner candidates.
-- [ ] Validate branding and readability at small sizes.
-- [ ] Select final assets for SVN top-level assets folder.
+- [x] Generate icon and banner candidates.
+- [x] Validate branding and readability at small sizes.
+- [x] Select final assets for SVN top-level assets folder.
 
 Decision recorded in:
 
@@ -110,6 +110,13 @@ Selected workflow:
 Selected style direction:
 
 - Product UI-first with clean editorial tone
+
+Final assets prepared:
+
+- `assets/images/icon-128x128.png` (128x128)
+- `assets/images/icon-256x256.png` (256x256)
+- `assets/images/banner-772x250.png` (772x250)
+- `assets/images/banner-1544x500.png` (1544x500)
 
 Suggested services to evaluate:
 
