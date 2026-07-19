@@ -125,10 +125,11 @@ final class Audio_Converter_Job_Store {
 		global $wpdb;
 
 		$table_name = self::table_name();
-		// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and query is prepared for value placeholders.
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- plugin-owned runtime table read.
 		$existing   = $wpdb->get_var(
 			$wpdb->prepare(
-				"SELECT run_id FROM {$table_name} WHERE external_run_id = %s LIMIT 1",
+				'SELECT run_id FROM %i WHERE external_run_id = %s LIMIT 1',
+				$table_name,
 				$external_run_id
 			)
 		);
@@ -162,10 +163,11 @@ final class Audio_Converter_Job_Store {
 		);
 
 		if ( false === $inserted ) {
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and query is prepared for value placeholders.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- plugin-owned runtime table read.
 			$existing_after_race = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT run_id FROM {$table_name} WHERE external_run_id = %s LIMIT 1",
+					'SELECT run_id FROM %i WHERE external_run_id = %s LIMIT 1',
+					$table_name,
 					$external_run_id
 				)
 			);
@@ -191,10 +193,11 @@ final class Audio_Converter_Job_Store {
 			global $wpdb;
 
 			$table_name = self::table_name();
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and query is prepared for value placeholders.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- plugin-owned runtime table read.
 			$status     = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT status FROM {$table_name} WHERE run_id = %s LIMIT 1",
+					'SELECT status FROM %i WHERE run_id = %s LIMIT 1',
+					$table_name,
 					$run_id
 				)
 			);
@@ -315,10 +318,11 @@ final class Audio_Converter_Job_Store {
 			global $wpdb;
 
 			$table_name     = self::table_name();
-			// phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared,WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- table name is plugin-owned and query is prepared for value placeholders.
+			// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching -- plugin-owned runtime table read.
 			$response_json  = $wpdb->get_var(
 				$wpdb->prepare(
-					"SELECT response_json FROM {$table_name} WHERE run_id = %s LIMIT 1",
+					'SELECT response_json FROM %i WHERE run_id = %s LIMIT 1',
+					$table_name,
 					$run_id
 				)
 			);
