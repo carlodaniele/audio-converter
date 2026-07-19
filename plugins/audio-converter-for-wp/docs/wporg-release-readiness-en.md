@@ -6,7 +6,12 @@ Use this checklist to finalize and submit the Free v1 package to WordPress.org.
 
 - [x] `Stable tag` set in `readme.txt`.
 - [x] Free feature scope aligned in `README.md` and `readme.txt`.
-- [ ] Confirm decision note for excluded Free v1 formats (`opus`, `webm audio-only`).
+- [x] Confirm decision note for excluded Free v1 formats (`opus`, `webm audio-only`).
+
+Decision note (2026-07-19):
+
+- `opus`: excluded from Free v1 due to current server-side processing limitations.
+- `webm` (audio-only): excluded from Free v1 due to current media picker flow constraints.
 
 ## 2. Visual assets
 
@@ -39,3 +44,7 @@ cd /Users/carlo/Documents/audio-converter
 - [ ] Upload plugin package to WordPress.org flow.
 - [ ] Upload top-level visual assets to WP.org SVN assets folder.
 - [ ] Run final manual review on rendered plugin page.
+
+Handoff reference:
+
+- `docs/wporg-submission-handoff-en.md`
