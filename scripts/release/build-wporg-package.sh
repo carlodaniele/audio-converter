@@ -50,10 +50,15 @@ trap 'rm -rf "$TMP_DIR"' EXIT
 
 rsync -a \
   --exclude '.DS_Store' \
+  --exclude '__MACOSX' \
+  --exclude '._*' \
   --exclude '.git' \
   --exclude '.github' \
   --exclude 'node_modules' \
   "$PLUGIN_DIR/" "$TMP_DIR/audio-converter/"
+
+# Defensive cleanup for macOS metadata in case files are created after sync.
+find "$TMP_DIR/audio-converter" \( -name '.DS_Store' -o -name '._*' \) -delete
 
 ( cd "$TMP_DIR" && zip -rq "$ZIP_PATH" "audio-converter" )
 
