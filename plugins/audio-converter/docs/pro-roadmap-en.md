@@ -37,3 +37,41 @@ Goal: allow editors to use audio formats not natively supported by WordPress upl
 - Regression path: native mp3/ogg behavior unchanged.
 - Failure path: missing converter backend returns actionable error.
 - Performance path: long audio near configured limits.
+
+## Planned feature: additional editor support (Pro)
+
+Goal: extend generation and insertion flows beyond Gutenberg to other editorial environments.
+
+### Why this matters
+
+- Some teams publish with Classic Editor or page builders.
+- Pro users may need one audio-to-draft workflow across mixed editorial stacks.
+
+### Proposed Pro behavior
+
+- Keep Gutenberg as the default and best-supported editor flow.
+- Add adapter-based integrations for additional editors, starting with:
+	- Classic Editor (post content insertion)
+	- Builder adapters where technically feasible
+- Preserve Free behavior unchanged.
+
+### Technical acceptance criteria
+
+- Editor detection is reliable and does not break Gutenberg behavior.
+- Each supported editor has a dedicated insertion adapter.
+- Fallback mode exists when a specific editor adapter is unavailable.
+- Observability logs include detected editor and adapter outcome.
+- Feature flag allows staged rollout per editor integration.
+
+### Security and operations notes
+
+- Respect capability checks and nonce/auth requirements per editor context.
+- Sanitize inserted output according to target editor content model.
+- Avoid editor-specific lock-in in core pipeline; keep integrations in adapters.
+
+### Test plan (for Pro phase)
+
+- Success path: same audio input generates a valid draft in Gutenberg and Classic Editor.
+- Regression path: current Gutenberg flow remains unchanged.
+- Fallback path: unsupported editor returns actionable message without data loss.
+- Compatibility path: adapter behavior validated across recent WordPress versions.
