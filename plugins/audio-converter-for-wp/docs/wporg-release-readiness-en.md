@@ -23,16 +23,16 @@ Use this checklist to finalize and submit the Free v1 package to WordPress.org.
 
 ## 4. Packaging
 
-- [ ] Build zip package with:
+- [x] Build zip package with:
 
 ```bash
 cd /Users/carlo/Documents/audio-converter
 ./scripts/release/build-wporg-package.sh
 ```
 
-- [ ] Confirm generated files:
-  - `dist/wporg/audio-converter-for-wp-<stable-tag>.zip`
-  - `dist/wporg/audio-converter-for-wp-<stable-tag>.zip.sha256`
+- [x] Confirm generated files:
+  - `dist/wporg/audio-converter-for-wp-0.1.0.zip`
+  - `dist/wporg/audio-converter-for-wp-0.1.0.zip.sha256`
 
 ## 5. Submission handoff
 

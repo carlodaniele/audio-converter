@@ -2,3 +2,4 @@
 **/.DS_Store
 references/repos/
 plugins/*.zip
+dist/
