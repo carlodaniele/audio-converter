@@ -30,6 +30,7 @@ Audio Converter for WP generates a structured post draft from an audio file dire
 - `docs/free-faq-pl.md`
 - `docs/wporg-screenshots-checklist-en.md`
 - `docs/wporg-screenshot-capture-runbook-en.md`
+- `docs/wporg-visual-assets-runbook-en.md`
 - `docs/api-endpoint-test-evidence-en.md`
 - `docs/uninstall-data-cleanup-runbook-en.md`
 - `docs/retry-fault-injection-runbook-en.md`

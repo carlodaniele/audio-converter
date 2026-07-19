@@ -91,11 +91,25 @@ Use this section to track what is done and what is still pending before WP.org s
 
 ## WP.org visual assets (outside screenshots)
 
-- [ ] Choose the image design service/workflow for WP.org visual assets.
-- [ ] Define final style direction (clean editorial, modern SaaS, or product UI-first).
+- [x] Choose the image design service/workflow for WP.org visual assets.
+- [x] Define final style direction (clean editorial, modern SaaS, or product UI-first).
 - [ ] Generate icon and banner candidates.
 - [ ] Validate branding and readability at small sizes.
 - [ ] Select final assets for SVN top-level assets folder.
+
+Decision recorded in:
+
+- `docs/wporg-visual-assets-runbook-en.md`
+
+Selected workflow:
+
+- Ideogram for concept drafts
+- Figma for final layout/export
+- Canva or TinyPNG lossless for final optimization
+
+Selected style direction:
+
+- Product UI-first with clean editorial tone
 
 Suggested services to evaluate:
 
