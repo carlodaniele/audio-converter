@@ -14,7 +14,7 @@ Wazne: bez aktywnego konektora AI wtyczka moze byc aktywna, ale nie wygeneruje s
 ## 1) Instalacja
 
 1. Skopiuj folder wtyczki do wp-content/plugins.
-2. Aktywuj Audio Converter for WP.
+2. Aktywuj Audio Converter.
 3. Przejdz do Ustawienia > Audio Converter.
 4. Zapisz ustawienia domyslne.
 

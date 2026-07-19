@@ -46,7 +46,7 @@ SUMMARY_FILE="$ROOT_DIR/reports/phase2/contract-summary.md"
   echo "# Contract Summary"
   echo
   echo "Date: $(date '+%Y-%m-%d %H:%M:%S')"
-  echo "Ability: audio-converter-for-wp/audio-to-post"
+  echo "Ability: audio-converter/audio-to-post"
   echo "Contract Version: 1.0.0"
   echo
   echo "## Files"

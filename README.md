@@ -9,7 +9,7 @@ The project is evolving toward a platform-agnostic core plus adapters:
 - `core/` shared business logic contract and orchestration notes.
 - `adapters/wordpress/` integration notes for WordPress.
 - `adapters/astro/` integration notes for Astro.
-- `plugins/audio-converter-for-wp/` current working WordPress adapter implementation.
+- `plugins/audio-converter/` current working WordPress adapter implementation.
 - `.github/workflows/` CI automation checks.
 
 Detailed target notes are in:

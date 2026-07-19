@@ -42,7 +42,7 @@ final class Audio_Converter_Observability {
 		error_log(
 			wp_json_encode(
 				array(
-					'component' => 'audio-converter-for-wp',
+					'component' => 'audio-converter',
 					'event'     => $event,
 					'context'   => $context,
 					'time'      => gmdate( 'c' ),

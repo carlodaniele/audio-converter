@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: Audio Converter for WP
+ * Plugin Name: Audio Converter
  * Description: Ability-first audio-to-post pipeline skeleton for WordPress.
  * Version: 0.1.0
  * Requires at least: 7.0
  * Requires PHP: 8.0
  * Author: Carlo Daniele
  * License: GPL-2.0-or-later
- * Text Domain: audio-converter-for-wp
+ * Text Domain: audio-converter
  * Domain Path: /languages
  */
 

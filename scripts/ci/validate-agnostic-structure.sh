@@ -16,7 +16,7 @@ check_path "core/CONTRACT.md"
 check_path "adapters/wordpress/README.md"
 check_path "adapters/astro/README.md"
 check_path "docs/architecture-target.md"
-check_path "plugins/audio-converter-for-wp/audio-converter-for-wp.php"
+check_path "plugins/audio-converter/audio-converter.php"
 
 if [[ "$missing" -ne 0 ]]; then
   echo "Agnostic structure validation failed."

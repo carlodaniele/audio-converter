@@ -14,7 +14,7 @@ Important: without an active AI connector, the plugin can be activated but canno
 ## 1) Installation
 
 1. Copy the plugin folder to wp-content/plugins.
-2. Activate Audio Converter for WP.
+2. Activate Audio Converter.
 3. Go to Settings > Audio Converter.
 4. Save your defaults.
 

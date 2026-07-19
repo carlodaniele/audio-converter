@@ -5,8 +5,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class Audio_Converter_Plugin {
-	const ABILITY_NAME                    = 'audio-converter-for-wp/audio-to-post';
-	const ABILITY_RUN_PATH                = '/wp-abilities/v1/abilities/audio-converter-for-wp/audio-to-post/run';
+	const ABILITY_NAME                    = 'audio-converter/audio-to-post';
+	const ABILITY_RUN_PATH                = '/wp-abilities/v1/abilities/audio-converter/audio-to-post/run';
 	const OPTION_KEY                      = 'aicb_settings';
 
 	public static function init(): void {
@@ -16,15 +16,15 @@ final class Audio_Converter_Plugin {
 		add_action( 'admin_menu', array( __CLASS__, 'register_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_assets' ) );
 		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_editor_assets' ) );
-		add_filter( 'plugin_action_links_audio-converter-for-wp/audio-converter-for-wp.php', array( __CLASS__, 'plugin_action_links' ) );
+		add_filter( 'plugin_action_links_audio-converter/audio-converter.php', array( __CLASS__, 'plugin_action_links' ) );
 	}
 
 	public static function plugin_action_links( array $links ): array {
-		$settings_url = admin_url( 'options-general.php?page=audio-converter-for-wp' );
+		$settings_url = admin_url( 'options-general.php?page=audio-converter' );
 		$settings_link = sprintf(
 			'<a href="%1$s">%2$s</a>',
 			esc_url( $settings_url ),
-			esc_html__( 'Settings', 'audio-converter-for-wp' )
+			esc_html__( 'Settings', 'audio-converter' )
 		);
 
 		array_unshift( $links, $settings_link );
@@ -373,10 +373,10 @@ final class Audio_Converter_Plugin {
 
 	public static function register_admin_menu(): void {
 		add_options_page(
-			'Audio Converter for WP',
+			'Audio Converter',
 			'Audio Converter',
 			'manage_options',
-			'audio-converter-for-wp',
+			'audio-converter',
 			array( __CLASS__, 'render_settings_page' )
 		);
 	}
@@ -404,7 +404,7 @@ final class Audio_Converter_Plugin {
 		$refresh_url                = wp_nonce_url(
 			add_query_arg(
 				array(
-					'page'                   => 'audio-converter-for-wp',
+					'page'                   => 'audio-converter',
 					'aicb_refresh_languages' => '1',
 				),
 				admin_url( 'options-general.php' )
@@ -413,7 +413,7 @@ final class Audio_Converter_Plugin {
 		);
 		?>
 		<div class="wrap">
-			<h1>Audio Converter for WP</h1>
+			<h1>Audio Converter</h1>
 			<p>Configure default editorial values used by the Gutenberg sidebar.</p>
 			<?php if ( $did_refresh ) : ?>
 				<div class="notice notice-success is-dismissible"><p>Language catalog refreshed.</p></div>
@@ -511,7 +511,7 @@ final class Audio_Converter_Plugin {
 		);
 
 		if ( function_exists( 'wp_set_script_translations' ) ) {
-			wp_set_script_translations( 'audio-converter-editor-sidebar', 'audio-converter-for-wp' );
+			wp_set_script_translations( 'audio-converter-editor-sidebar', 'audio-converter' );
 		}
 
 		$settings = self::get_settings();
@@ -532,7 +532,7 @@ final class Audio_Converter_Plugin {
 	}
 
 	public static function enqueue_admin_assets( string $hook ): void {
-		if ( 'settings_page_audio-converter-for-wp' !== $hook ) {
+		if ( 'settings_page_audio-converter' !== $hook ) {
 			return;
 		}
 

@@ -16,9 +16,9 @@ Run on target host:
 
 ```bash
 grep -En "ai_retry_exhausted|run_received|log_lifecycle" \
-  /www/audioconverter_259/public/wp-content/plugins/audio-converter-for-wp/includes/class-ai-processor.php \
-  /www/audioconverter_259/public/wp-content/plugins/audio-converter-for-wp/includes/class-rest-controller.php \
-  /www/audioconverter_259/public/wp-content/plugins/audio-converter-for-wp/includes/class-observability.php
+  /www/audioconverter_259/public/wp-content/plugins/audio-converter/includes/class-ai-processor.php \
+  /www/audioconverter_259/public/wp-content/plugins/audio-converter/includes/class-rest-controller.php \
+  /www/audioconverter_259/public/wp-content/plugins/audio-converter/includes/class-observability.php
 ```
 
 Expected:

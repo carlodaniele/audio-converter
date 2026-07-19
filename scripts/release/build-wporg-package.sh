@@ -2,7 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-PLUGIN_DIR="$ROOT_DIR/plugins/audio-converter-for-wp"
+PLUGIN_DIR="$ROOT_DIR/plugins/audio-converter"
 README_TXT="$PLUGIN_DIR/readme.txt"
 ASSETS_DIR="$PLUGIN_DIR/assets"
 OUTPUT_DIR="$ROOT_DIR/dist/wporg"
@@ -39,7 +39,7 @@ done
 
 mkdir -p "$OUTPUT_DIR"
 
-ZIP_NAME="audio-converter-for-wp-${STABLE_TAG}.zip"
+ZIP_NAME="audio-converter-${STABLE_TAG}.zip"
 ZIP_PATH="$OUTPUT_DIR/$ZIP_NAME"
 SHA_PATH="$ZIP_PATH.sha256"
 
@@ -53,9 +53,9 @@ rsync -a \
   --exclude '.git' \
   --exclude '.github' \
   --exclude 'node_modules' \
-  "$PLUGIN_DIR/" "$TMP_DIR/audio-converter-for-wp/"
+  "$PLUGIN_DIR/" "$TMP_DIR/audio-converter/"
 
-( cd "$TMP_DIR" && zip -rq "$ZIP_PATH" "audio-converter-for-wp" )
+( cd "$TMP_DIR" && zip -rq "$ZIP_PATH" "audio-converter" )
 
 shasum -a 256 "$ZIP_PATH" > "$SHA_PATH"
 

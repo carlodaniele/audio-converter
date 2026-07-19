@@ -72,26 +72,26 @@
 
 	function getTargetLengthLabel(value) {
 		if ("short" === value) {
-			return __("short (~250-450 words)", "audio-converter-for-wp");
+			return __("short (~250-450 words)", "audio-converter");
 		}
 
 		if ("long" === value) {
-			return __("long (~900-1400 words)", "audio-converter-for-wp");
+			return __("long (~900-1400 words)", "audio-converter");
 		}
 
-		return __("medium (~500-850 words)", "audio-converter-for-wp");
+		return __("medium (~500-850 words)", "audio-converter");
 	}
 
 	function getTargetLengthHelp(value) {
 		if ("short" === value) {
-			return __("Approximate output length: 250 to 450 words.", "audio-converter-for-wp");
+			return __("Approximate output length: 250 to 450 words.", "audio-converter");
 		}
 
 		if ("long" === value) {
-			return __("Approximate output length: 900 to 1400 words.", "audio-converter-for-wp");
+			return __("Approximate output length: 900 to 1400 words.", "audio-converter");
 		}
 
-		return __("Approximate output length: 500 to 850 words.", "audio-converter-for-wp");
+		return __("Approximate output length: 500 to 850 words.", "audio-converter");
 	}
 
 	function countWordsFromHtml(html) {
@@ -190,11 +190,11 @@
 
 		function getAudioPreflightWarning() {
 			if (audioSizeBytes > MAX_AUDIO_SIZE_BYTES) {
-				return __("Selected audio file is too large (recommended max 25 MB). Please choose a smaller file or trim it before generating.", "audio-converter-for-wp");
+				return __("Selected audio file is too large (recommended max 25 MB). Please choose a smaller file or trim it before generating.", "audio-converter");
 			}
 
 			if (audioDurationSeconds > MAX_AUDIO_DURATION_SECONDS) {
-				return __("Selected audio is too long (recommended max 15 minutes). Please split or trim it before generating.", "audio-converter-for-wp");
+				return __("Selected audio is too long (recommended max 15 minutes). Please split or trim it before generating.", "audio-converter");
 			}
 
 			return "";
@@ -232,7 +232,7 @@
 					return call(primaryPath, payload)
 						.catch(function (directPrimaryError) {
 							if (isNoRoute(error) || isNoRoute(directPrimaryError)) {
-								throw new Error(__("Ability endpoint route not found. Ensure WordPress Abilities API is available and plugin routes are registered.", "audio-converter-for-wp"));
+								throw new Error(__("Ability endpoint route not found. Ensure WordPress Abilities API is available and plugin routes are registered.", "audio-converter"));
 							}
 
 							throw directPrimaryError;
@@ -342,13 +342,13 @@
 
 		function openMediaLibrary() {
 			if (!wp.media) {
-				setNotice({ status: "error", message: __("WordPress media library is unavailable.", "audio-converter-for-wp") });
+				setNotice({ status: "error", message: __("WordPress media library is unavailable.", "audio-converter") });
 				return;
 			}
 
 			var frame = wp.media({
-				title: __("Select audio", "audio-converter-for-wp"),
-				button: { text: __("Use this audio", "audio-converter-for-wp") },
+				title: __("Select audio", "audio-converter"),
+				button: { text: __("Use this audio", "audio-converter") },
 				library: { type: "audio" },
 				multiple: false
 			});
@@ -361,7 +361,7 @@
 
 				var media = selection.toJSON();
 				setAudioId(media.id || 0);
-				setAudioLabel(media.title || media.filename || sprintf(__("Audio #%d", "audio-converter-for-wp"), media.id));
+				setAudioLabel(media.title || media.filename || sprintf(__("Audio #%d", "audio-converter"), media.id));
 
 				var sizeBytes = toInteger(media.filesizeInBytes);
 				if (!sizeBytes && media.filesize && "object" === typeof media.filesize) {
@@ -389,12 +389,12 @@
 			}
 
 			if (!window.AICBData || !window.AICBData.abilityRunPath || !window.AICBData.nonce) {
-				setNotice({ status: "error", message: __("Plugin configuration missing in editor context.", "audio-converter-for-wp") });
+				setNotice({ status: "error", message: __("Plugin configuration missing in editor context.", "audio-converter") });
 				return;
 			}
 
 			if (!audioId) {
-				setNotice({ status: "warning", message: __("Select an audio file first.", "audio-converter-for-wp") });
+				setNotice({ status: "warning", message: __("Select an audio file first.", "audio-converter") });
 				return;
 			}
 
@@ -430,13 +430,13 @@
 					response = normalizeAbilityResponse(response);
 
 					if (!response || response.status === "failed") {
-						var msg = response && response.error && response.error.message ? response.error.message : __("Generation failed.", "audio-converter-for-wp");
+						var msg = response && response.error && response.error.message ? response.error.message : __("Generation failed.", "audio-converter");
 						setNotice({ status: "error", message: msg });
 						return;
 					}
 
 					if (response.status !== "completed") {
-						setNotice({ status: "info", message: __("Run accepted. Current status:", "audio-converter-for-wp") + " " + response.status });
+						setNotice({ status: "info", message: __("Run accepted. Current status:", "audio-converter") + " " + response.status });
 						return;
 					}
 
@@ -446,7 +446,7 @@
 					}
 
 					if (!hasInjectedBlocks) {
-						setNotice({ status: "warning", message: __("No blocks were inserted into the editor.", "audio-converter-for-wp") });
+						setNotice({ status: "warning", message: __("No blocks were inserted into the editor.", "audio-converter") });
 						return;
 					}
 
@@ -454,17 +454,17 @@
 					if (wordCount > 0) {
 						setNotice({
 							status: "success",
-							message: sprintf(__("Content generated successfully. Approximate word count: %d.", "audio-converter-for-wp"), wordCount)
+							message: sprintf(__("Content generated successfully. Approximate word count: %d.", "audio-converter"), wordCount)
 						});
 						return;
 					}
 
-					setNotice({ status: "success", message: __("Content generated successfully.", "audio-converter-for-wp") });
+					setNotice({ status: "success", message: __("Content generated successfully.", "audio-converter") });
 				})
 				.catch(function (error) {
 					setNotice({
 						status: "error",
-						message: error && error.message ? error.message : __("Unexpected request error.", "audio-converter-for-wp")
+						message: error && error.message ? error.message : __("Unexpected request error.", "audio-converter")
 					});
 				})
 				.finally(function () {
@@ -478,17 +478,17 @@
 			notice ? el(Notice, { status: notice.status, isDismissible: true, onRemove: function () { setNotice(null); } }, notice.message) : null,
 			el(
 				PanelBody,
-				{ title: __("Audio source", "audio-converter-for-wp"), initialOpen: true },
-				el(Button, { variant: "secondary", onClick: openMediaLibrary }, __("Select audio from Media Library", "audio-converter-for-wp")),
+				{ title: __("Audio source", "audio-converter"), initialOpen: true },
+				el(Button, { variant: "secondary", onClick: openMediaLibrary }, __("Select audio from Media Library", "audio-converter")),
 				el(
 					"p",
 					{ style: { marginTop: "8px", marginBottom: "8px", color: "#50575e", fontSize: "12px", lineHeight: "1.4" } },
-					__("Supported files: MP3, OGG, WAV, M4A, AAC, FLAC.", "audio-converter-for-wp")
+					__("Supported files: MP3, OGG, WAV, M4A, AAC, FLAC.", "audio-converter")
 				),
 				el(
 					"p",
 					{ style: { marginTop: "8px", marginBottom: "8px", color: "#757575", fontSize: "12px", lineHeight: "1.4" } },
-					__("Recommended limits: up to 6 minutes and 25 MB to reduce timeout risk.", "audio-converter-for-wp")
+					__("Recommended limits: up to 6 minutes and 25 MB to reduce timeout risk.", "audio-converter")
 				),
 				audioLabel
 					? el(
@@ -512,38 +512,38 @@
 								boxShadow: "0 0 0 2px rgba(47,179,68,0.2)"
 							}
 						}),
-						__("Selected:", "audio-converter-for-wp") + " " + audioLabel
+						__("Selected:", "audio-converter") + " " + audioLabel
 					)
-					: el("p", null, __("No audio selected", "audio-converter-for-wp"))
+					: el("p", null, __("No audio selected", "audio-converter"))
 			),
 			el(
 				PanelBody,
-				{ title: __("Editorial options", "audio-converter-for-wp"), initialOpen: false },
+				{ title: __("Editorial options", "audio-converter"), initialOpen: false },
 				el(
 					"div",
 					{ style: fieldGroupStyle },
 					el(SelectControl, {
-						label: __("Language", "audio-converter-for-wp"),
+						label: __("Language", "audio-converter"),
 						value: language,
 						options: languageOptions,
 						onChange: setLanguage,
 						help: hasRemoteLanguageCatalog
-							? __("Choose the default output language.", "audio-converter-for-wp")
-							: __("Showing installed languages only. Remote WordPress language catalog is currently unavailable.", "audio-converter-for-wp")
+							? __("Choose the default output language.", "audio-converter")
+							: __("Showing installed languages only. Remote WordPress language catalog is currently unavailable.", "audio-converter")
 					})
 				),
 				el(
 					"div",
 					{ style: fieldGroupStyle },
 					el(SelectControl, {
-						label: __("Tone", "audio-converter-for-wp"),
+						label: __("Tone", "audio-converter"),
 						value: tone,
 						options: [
-							{ label: __("professional", "audio-converter-for-wp"), value: "professional" },
-							{ label: __("neutral", "audio-converter-for-wp"), value: "neutral" },
-							{ label: __("conversational", "audio-converter-for-wp"), value: "conversational" }
+							{ label: __("professional", "audio-converter"), value: "professional" },
+							{ label: __("neutral", "audio-converter"), value: "neutral" },
+							{ label: __("conversational", "audio-converter"), value: "conversational" }
 						],
-						help: __("Defines the writing style used for the generated draft.", "audio-converter-for-wp"),
+						help: __("Defines the writing style used for the generated draft.", "audio-converter"),
 						onChange: setTone
 					})
 				),
@@ -551,7 +551,7 @@
 					"div",
 					{ style: fieldGroupStyle },
 					el(SelectControl, {
-						label: __("Target length", "audio-converter-for-wp"),
+						label: __("Target length", "audio-converter"),
 						value: targetLength,
 						options: [
 							{ label: getTargetLengthLabel("short"), value: "short" },
@@ -566,10 +566,10 @@
 					"div",
 					{ style: fieldGroupStyle },
 					el(TextareaControl, {
-						label: __("Proper noun hints (comma or new line separated)", "audio-converter-for-wp"),
+						label: __("Proper noun hints (comma or new line separated)", "audio-converter"),
 						value: hintsRaw,
 						onChange: setHintsRaw,
-						help: __("Use this field to protect names that must remain accurate (people, places, brands, products). Example: Marrakech, BMW GS.", "audio-converter-for-wp"),
+						help: __("Use this field to protect names that must remain accurate (people, places, brands, products). Example: Marrakech, BMW GS.", "audio-converter"),
 						rows: 4
 					})
 				),
@@ -577,25 +577,25 @@
 					"div",
 					{ style: { marginBottom: 0 } },
 					el(SelectControl, {
-						label: __("Editor insertion mode", "audio-converter-for-wp"),
+						label: __("Editor insertion mode", "audio-converter"),
 						value: insertionMode,
 						options: [
-							{ label: __("Append (recommended)", "audio-converter-for-wp"), value: "append" },
-							{ label: __("Replace", "audio-converter-for-wp"), value: "replace" }
+							{ label: __("Append (recommended)", "audio-converter"), value: "append" },
+							{ label: __("Replace", "audio-converter"), value: "replace" }
 						],
-						help: __("Append adds new blocks at the end. Replace overwrites current editor blocks.", "audio-converter-for-wp"),
+						help: __("Append adds new blocks at the end. Replace overwrites current editor blocks.", "audio-converter"),
 						onChange: setInsertionMode
 					})
 				)
 			),
 			el(
 				PanelBody,
-				{ title: __("Generate", "audio-converter-for-wp"), initialOpen: true },
+				{ title: __("Generate", "audio-converter"), initialOpen: true },
 				getAudioPreflightWarning() ? el(Notice, { status: "warning", isDismissible: false }, getAudioPreflightWarning()) : null,
 				el(
 					"p",
 					{ style: { marginTop: 0, marginBottom: "8px", color: "#50575e" } },
-					audioId ? __("Audio selected. Ready to generate.", "audio-converter-for-wp") : __("Select an audio file to enable generation.", "audio-converter-for-wp")
+					audioId ? __("Audio selected. Ready to generate.", "audio-converter") : __("Select an audio file to enable generation.", "audio-converter")
 				),
 				el(
 					Button,
@@ -605,7 +605,7 @@
 						onClick: generateFromAudio,
 						style: { width: "100%", justifyContent: "center" }
 					},
-					isLoading ? __("Generating...", "audio-converter-for-wp") : __("Generate draft from audio", "audio-converter-for-wp")
+					isLoading ? __("Generating...", "audio-converter") : __("Generate draft from audio", "audio-converter")
 				),
 				isLoading ? el("p", { style: { marginTop: "8px", marginBottom: 0 } }, el(Spinner, null)) : null
 			)
@@ -616,12 +616,12 @@
 		return el(
 			wp.element.Fragment,
 			null,
-			el(PluginSidebarMoreMenuItem, { target: "audio-converter-sidebar" }, __("Audio Converter", "audio-converter-for-wp")),
-			el(PluginSidebar, { name: "audio-converter-sidebar", title: __("Audio Converter", "audio-converter-for-wp") }, el(SidebarApp, null))
+			el(PluginSidebarMoreMenuItem, { target: "audio-converter-sidebar" }, __("Audio Converter", "audio-converter")),
+			el(PluginSidebar, { name: "audio-converter-sidebar", title: __("Audio Converter", "audio-converter") }, el(SidebarApp, null))
 		);
 	}
 
-	registerPlugin("audio-converter-for-wp-sidebar", {
+	registerPlugin("audio-converter-sidebar", {
 		render: SidebarRoot
 	});
 })(window.wp);

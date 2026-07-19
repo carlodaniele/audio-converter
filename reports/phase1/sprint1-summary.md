@@ -19,7 +19,7 @@ Unauthorized access test validated against real endpoint.
 
 ## Evidence
 
-- plugins/audio-converter-for-wp/docs/api-endpoint-test-evidence-en.md
+- plugins/audio-converter/docs/api-endpoint-test-evidence-en.md
 - scripts/phase3/test-idempotency-replay.sh
 - scripts/phase3/test-unauthorized-access.sh
 - scripts/phase3/smoke-test.sh

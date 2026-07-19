@@ -1,4 +1,4 @@
-=== Audio Converter for WP ===
+=== Audio Converter ===
 Contributors: carlo
 Tags: ai, audio, content, editor, gutenberg
 Requires at least: 7.0
@@ -12,7 +12,7 @@ Generate a structured post draft from an audio file directly in the WordPress bl
 
 == Description ==
 
-Audio Converter for WP helps editors turn audio notes into post drafts.
+Audio Converter helps editors turn audio notes into post drafts.
 
 Draft generation requires at least one configured WordPress AI connector. If no connector is available, the plugin can stay active but generation requests will return provider errors.
 
@@ -48,7 +48,7 @@ External services and data handling:
 == Installation ==
 
 1. Upload the plugin folder to /wp-content/plugins/ or install from Plugins.
-2. Activate "Audio Converter for WP".
+2. Activate "Audio Converter".
 3. Go to Settings > Audio Converter and save your defaults.
 4. Open any post in the block editor and use the Audio Converter sidebar.
 

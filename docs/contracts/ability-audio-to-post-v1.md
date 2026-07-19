@@ -1,4 +1,4 @@
-# Ability Contract v1 - audio-converter-for-wp/audio-to-post
+# Ability Contract v1 - audio-converter/audio-to-post
 
 ## Scope
 
@@ -7,7 +7,7 @@ Il contratto e' API-first e vincolante per plugin WordPress e orchestratore.
 
 ## Ability
 
-- Name: audio-converter-for-wp/audio-to-post
+- Name: audio-converter/audio-to-post
 - Contract version: 1.0.0
 - Method: POST (ability run)
 - Auth: utente autenticato con permesso edit_posts

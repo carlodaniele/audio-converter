@@ -7,15 +7,15 @@ Status: COMPLETED
 ## Progress Update
 
 - 2026-07-13: S2-01 setup started. Added deterministic fault-injection hook and runbook for retry-path testing.
-- Evidence: plugins/audio-converter-for-wp/docs/retry-fault-injection-runbook-en.md
+- Evidence: plugins/audio-converter/docs/retry-fault-injection-runbook-en.md
 - 2026-07-13: S2-01 validation passed on real WordPress with 429 fault-injection.
-- Evidence: scripts/phase3/test-retry-fault-429.sh + plugins/audio-converter-for-wp/docs/api-endpoint-test-evidence-en.md
+- Evidence: scripts/phase3/test-retry-fault-429.sh + plugins/audio-converter/docs/api-endpoint-test-evidence-en.md
 - 2026-07-19: S2-02 implementation completed (standardized lifecycle/retry observability fields).
-- Evidence: plugins/audio-converter-for-wp/includes/class-observability.php + plugins/audio-converter-for-wp/includes/class-rest-controller.php + plugins/audio-converter-for-wp/includes/class-ai-processor.php
+- Evidence: plugins/audio-converter/includes/class-observability.php + plugins/audio-converter/includes/class-rest-controller.php + plugins/audio-converter/includes/class-ai-processor.php
 - 2026-07-19: S2-02 local validation passed (Phase 3 validator + PHP lint on changed files).
 - Evidence: scripts/phase3/validate-phase3.sh
 - 2026-07-19: S2-02 real WordPress smoke test passed (valid + invalid payload assertions).
-- Evidence: scripts/phase3/smoke-test.sh + plugins/audio-converter-for-wp/docs/api-endpoint-test-evidence-en.md
+- Evidence: scripts/phase3/smoke-test.sh + plugins/audio-converter/docs/api-endpoint-test-evidence-en.md
 - 2026-07-19: S2-02 WP_DEBUG_LOG inspection passed on target WordPress (lifecycle events present in production log).
 - Evidence: /www/audioconverter_259/public/wp-content/debug.log (captured output in test session)
 - 2026-07-19: production retry429 run executed, but fault injection was inactive (run completed; script exit 2).
@@ -48,7 +48,7 @@ Objective:
 Validate retry branches (429/503/504 and timeout) with controlled failures.
 
 Target areas:
-- plugins/audio-converter-for-wp/includes/class-ai-processor.php
+- plugins/audio-converter/includes/class-ai-processor.php
 - scripts/phase3/
 
 Deliverables:
@@ -71,9 +71,9 @@ Objective:
 Expose clearer operational signals for run lifecycle and retry decisions.
 
 Target areas:
-- plugins/audio-converter-for-wp/includes/class-observability.php
-- plugins/audio-converter-for-wp/includes/class-rest-controller.php
-- plugins/audio-converter-for-wp/includes/class-ai-processor.php
+- plugins/audio-converter/includes/class-observability.php
+- plugins/audio-converter/includes/class-rest-controller.php
+- plugins/audio-converter/includes/class-ai-processor.php
 
 Deliverables:
 - Structured event fields for retry reason and attempt count.

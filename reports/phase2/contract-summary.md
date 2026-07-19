@@ -1,7 +1,7 @@
 # Contract Summary
 
 Date: 2026-07-12 21:30:36
-Ability: audio-converter-for-wp/audio-to-post
+Ability: audio-converter/audio-to-post
 Contract Version: 1.0.0
 
 ## Files

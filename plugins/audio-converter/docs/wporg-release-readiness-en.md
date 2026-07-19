@@ -36,8 +36,8 @@ cd /Users/carlo/Documents/audio-converter
 ```
 
 - [x] Confirm generated files:
-  - `dist/wporg/audio-converter-for-wp-0.1.0.zip`
-  - `dist/wporg/audio-converter-for-wp-0.1.0.zip.sha256`
+  - `dist/wporg/audio-converter-0.1.0.zip`
+  - `dist/wporg/audio-converter-0.1.0.zip.sha256`
 
 ## 5. Submission handoff
 

@@ -1,6 +1,6 @@
-# Audio Converter for WP
+# Audio Converter
 
-Audio Converter for WP generates a structured post draft from an audio file directly inside the WordPress block editor.
+Audio Converter generates a structured post draft from an audio file directly inside the WordPress block editor.
 
 ## Free version scope
 
@@ -75,7 +75,7 @@ The plugin inserts generated Gutenberg blocks into the current post.
 
 ## API endpoint
 
-- Canonical (Abilities API): `/wp-json/wp-abilities/v1/abilities/audio-converter-for-wp/audio-to-post/run`
+- Canonical (Abilities API): `/wp-json/wp-abilities/v1/abilities/audio-converter/audio-to-post/run`
 
 ## API endpoint tests (completed)
 
@@ -97,5 +97,5 @@ Recommended script for retry fault-injection validation:
 
 ## i18n
 
-- Text domain: `audio-converter-for-wp`
-- POT file: `languages/audio-converter-for-wp.pot`
+- Text domain: `audio-converter`
+- POT file: `languages/audio-converter.pot`

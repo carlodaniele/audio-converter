@@ -11,7 +11,7 @@ Stato sprint: COMPLETED (P0)
 - 2026-07-13: S1-02 COMPLETED. Retry policy allineata (max 3, errori retryable) + hardening unauthorized verificato.
 - Evidenze principali: scripts/phase3/test-idempotency-replay.sh
 - Evidenze principali: scripts/phase3/test-unauthorized-access.sh
-- Evidenze principali: plugins/audio-converter-for-wp/docs/api-endpoint-test-evidence-en.md
+- Evidenze principali: plugins/audio-converter/docs/api-endpoint-test-evidence-en.md
 - Evidenze principali: scripts/phase3/validate-phase3.sh
 
 ## S1-01 - Idempotenza forte e job lifecycle persistito

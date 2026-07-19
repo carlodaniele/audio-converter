@@ -18,8 +18,8 @@ Real WordPress smoke validation and production log checks completed.
 ## Evidence
 
 - docs/phase1/sprint2-backlog.md
-- plugins/audio-converter-for-wp/docs/api-endpoint-test-evidence-en.md
-- plugins/audio-converter-for-wp/docs/retry-fault-injection-runbook-en.md
+- plugins/audio-converter/docs/api-endpoint-test-evidence-en.md
+- plugins/audio-converter/docs/retry-fault-injection-runbook-en.md
 - scripts/phase3/test-retry-fault-429.sh
 - scripts/phase3/smoke-test.sh
 - scripts/phase3/validate-phase3.sh

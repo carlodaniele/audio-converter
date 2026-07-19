@@ -13,9 +13,9 @@ Owner: Carlo Daniele
 
 | Area | Stato | Evidenza | Azione residua |
 |---|---|---|---|
-| Contratto v1 | Closed | reports/phase2/contract-summary.md, plugins/audio-converter-for-wp/docs/api-endpoint-test-evidence-en.md | Nessuna azione bloccante |
+| Contratto v1 | Closed | reports/phase2/contract-summary.md, plugins/audio-converter/docs/api-endpoint-test-evidence-en.md | Nessuna azione bloccante |
 | Affidabilita' (idempotenza/retry/cutover) | Mitigated | docs/phase1/decision-log.md (D-002, D-003, D-004) | Implementazione Sprint 1 (S1-01, S1-02) |
-| Sicurezza (permission/auth hardening) | Mitigated | docs/phase1/decision-log.md, plugins/audio-converter-for-wp/includes/class-audio-converter-plugin.php | Hardening test unauthorized in Sprint 1 |
+| Sicurezza (permission/auth hardening) | Mitigated | docs/phase1/decision-log.md, plugins/audio-converter/includes/class-audio-converter-plugin.php | Hardening test unauthorized in Sprint 1 |
 
 Nota: nessun blocker risulta senza decisione, owner e piano di esecuzione.
 
@@ -38,7 +38,7 @@ Nota: nessun blocker risulta senza decisione, owner e piano di esecuzione.
 |---|---|---|
 | Decisioni architetturali chiuse | PASS | docs/phase1/decision-log.md |
 | Contratto v1 validato | PASS | reports/phase2/contract-summary.md |
-| Endpoint smoke test reale in verde | PASS | plugins/audio-converter-for-wp/docs/api-endpoint-test-evidence-en.md |
+| Endpoint smoke test reale in verde | PASS | plugins/audio-converter/docs/api-endpoint-test-evidence-en.md |
 | DoD task S1 definita e testabile | PASS | docs/phase1/sprint1-p0-plan.md |
 
 ## Decisione Operativa

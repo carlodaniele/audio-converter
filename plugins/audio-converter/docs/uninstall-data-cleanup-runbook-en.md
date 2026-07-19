@@ -1,6 +1,6 @@
 # Uninstall Data Cleanup Runbook (Free v1)
 
-Use this runbook to verify that plugin uninstall removes runtime data created by Audio Converter for WP.
+Use this runbook to verify that plugin uninstall removes runtime data created by Audio Converter.
 
 ## Scope
 
@@ -38,11 +38,11 @@ Expected: at least one of these queries returns data.
 
 Choose one path:
 
-- WordPress Admin: Plugins > Installed Plugins > Audio Converter for WP > Delete
+- WordPress Admin: Plugins > Installed Plugins > Audio Converter > Delete
 - WP-CLI:
 
 ```bash
-wp plugin uninstall audio-converter-for-wp --deactivate
+wp plugin uninstall audio-converter --deactivate
 ```
 
 ## Step 4 - Verify cleanup after uninstall

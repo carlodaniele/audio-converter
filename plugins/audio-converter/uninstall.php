@@ -1,6 +1,6 @@
 <?php
 /**
- * Uninstall cleanup for Audio Converter for WP.
+ * Uninstall cleanup for Audio Converter.
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
