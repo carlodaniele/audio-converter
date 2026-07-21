@@ -14,8 +14,8 @@ Importante: senza un connettore AI attivo il plugin si attiva, ma non puo' gener
 ## 1) Installazione
 
 1. Copia la cartella del plugin in wp-content/plugins.
-2. Attiva Audio Converter.
-3. Vai in Settings > Audio Converter.
+2. Attiva Nomad Pipeline Audio to Draft.
+3. Vai in Settings > Nomad Pipeline Audio to Draft.
 4. Imposta i default e salva.
 
 ## 2) Configurazione consigliata
@@ -29,7 +29,7 @@ Importante: senza un connettore AI attivo il plugin si attiva, ma non puo' gener
 ## 3) Uso nel Block Editor
 
 1. Apri o crea un post.
-2. Apri la sidebar Audio Converter.
+2. Apri la sidebar Nomad Pipeline Audio to Draft.
 3. Clicca Select audio from Media Library.
 4. Seleziona un file audio.
 5. Controlla opzioni editoriali.

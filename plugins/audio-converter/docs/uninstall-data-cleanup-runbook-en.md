@@ -1,6 +1,6 @@
 # Uninstall Data Cleanup Runbook (Free v1)
 
-Use this runbook to verify that plugin uninstall removes runtime data created by Audio Converter.
+Use this runbook to verify that plugin uninstall removes runtime data created by Nomad Pipeline Audio to Draft.
 
 ## Scope
 
@@ -19,7 +19,7 @@ This check validates cleanup of:
 
 ## Step 1 - Create data to be cleaned
 
-1. Open WordPress admin and save plugin settings at least once (Settings > Audio Converter).
+1. Open WordPress admin and save plugin settings at least once (Settings > Nomad Pipeline Audio to Draft).
 2. Run at least one generation request so runtime transients are created.
 
 ## Step 2 - Capture baseline before uninstall
@@ -38,7 +38,7 @@ Expected: at least one of these queries returns data.
 
 Choose one path:
 
-- WordPress Admin: Plugins > Installed Plugins > Audio Converter > Delete
+- WordPress Admin: Plugins > Installed Plugins > Nomad Pipeline Audio to Draft > Delete
 - WP-CLI:
 
 ```bash

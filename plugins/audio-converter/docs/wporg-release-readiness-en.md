@@ -54,4 +54,4 @@ Submission log (2026-07-19):
 
 Handoff reference:
 
-- `docs/wporg-submission-handoff-en.md`
+- Keep internal submission notes outside the distributed plugin package.

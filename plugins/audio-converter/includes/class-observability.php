@@ -43,7 +43,7 @@ final class Audio_Converter_Observability {
 		error_log(
 			wp_json_encode(
 				array(
-					'component' => 'audio-converter',
+					'component' => 'nomad-pipeline-audio-to-draft',
 					'event'     => $event,
 					'context'   => $context,
 					'time'      => gmdate( 'c' ),

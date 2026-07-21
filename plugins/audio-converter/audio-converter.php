@@ -1,13 +1,13 @@
 <?php
 /**
- * Plugin Name: Audio Converter
- * Description: Ability-first audio-to-post pipeline skeleton for WordPress.
+ * Plugin Name: Nomad Pipeline Audio to Draft
+ * Description: Generate post drafts from audio in the WordPress block editor using WordPress AI connectors.
  * Version: 0.1.0
  * Requires at least: 7.0
  * Requires PHP: 8.0
  * Author: Carlo Daniele
  * License: GPL-2.0-or-later
- * Text Domain: audio-converter
+ * Text Domain: nomad-pipeline-audio-to-draft
  * Domain Path: /languages
  */
 

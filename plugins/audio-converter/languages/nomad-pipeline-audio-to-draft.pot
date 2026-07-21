@@ -1,37 +1,33 @@
-# Copyright (C) 2026 Audio Converter Team
+# Copyright (C) 2026 Nomad Pipeline Audio to Draft Team
 # This file is distributed under the GPL-2.0-or-later.
 msgid ""
 msgstr ""
-"Project-Id-Version: Audio Converter 0.1.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/audio-converter-"
-"for-wp\n"
-"POT-Creation-Date: 2026-07-07T16:21:07+00:00\n"
-"PO-Revision-Date: 2026-07-07T15:48:08+00:00\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
-"Language: it\n"
+"Project-Id-Version: Nomad Pipeline Audio to Draft 0.1.0\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/audio-converter\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"POT-Creation-Date: 2026-07-07T16:21:07+00:00\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
 "X-Domain: audio-converter\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. Plugin Name of the plugin
 #: audio-converter.php
-msgid "Audio Converter"
-msgstr "Audio Converter"
+msgid "Nomad Pipeline Audio to Draft"
+msgstr ""
 
 #. Description of the plugin
 #: audio-converter.php
-msgid "Ability-first audio-to-post pipeline skeleton for WordPress."
+msgid "Generate post drafts from audio in the WordPress block editor using WordPress AI connectors."
 msgstr ""
-"Scheletro pipeline da audio a post per WordPress, orientato alle Abilities."
 
 #. Author of the plugin
 #: audio-converter.php
-msgid "Audio Converter Team"
-msgstr "Team Audio Converter"
+msgid "Nomad Pipeline Audio to Draft Team"
+msgstr ""
 
 #: assets/editor-sidebar.js:48
 msgid "short (~250-450 words)"
@@ -59,76 +55,77 @@ msgstr ""
 
 #: assets/editor-sidebar.js:213
 msgid "WordPress media library is unavailable."
-msgstr "La libreria media di WordPress non e' disponibile."
+msgstr ""
 
 #: assets/editor-sidebar.js:218
 msgid "Select audio"
-msgstr "Seleziona audio"
+msgstr ""
 
 #: assets/editor-sidebar.js:219
 msgid "Use this audio"
-msgstr "Usa questo audio"
+msgstr ""
 
 #: assets/editor-sidebar.js:232
+#, js-format
 msgid "Audio #%d"
-msgstr "Audio #%d"
+msgstr ""
 
 #: assets/editor-sidebar.js:241
 msgid "Plugin configuration missing in editor context."
-msgstr "Configurazione plugin mancante nel contesto editor."
+msgstr ""
 
 #: assets/editor-sidebar.js:246
 msgid "Select an audio file first."
-msgstr "Seleziona prima un file audio."
+msgstr ""
 
 #: assets/editor-sidebar.js:281
 msgid "Generation failed."
-msgstr "Generazione non riuscita."
+msgstr ""
 
 #: assets/editor-sidebar.js:287
 msgid "Run accepted. Current status:"
-msgstr "Esecuzione accettata. Stato attuale:"
+msgstr ""
 
 #: assets/editor-sidebar.js:295
 msgid "No blocks were inserted into the editor."
-msgstr "Nessun blocco e' stato inserito nell'editor."
+msgstr ""
 
 #: assets/editor-sidebar.js:303
-#, fuzzy
+#, js-format
 msgid "Content generated successfully. Approximate word count: %d."
-msgstr "Contenuto generato con successo."
+msgstr ""
 
 #: assets/editor-sidebar.js:308
 msgid "Content generated successfully."
-msgstr "Contenuto generato con successo."
+msgstr ""
 
 #: assets/editor-sidebar.js:313
 msgid "Unexpected request error."
-msgstr "Errore imprevisto nella richiesta."
+msgstr ""
 
 #: assets/editor-sidebar.js:327
 msgid "Audio source"
-msgstr "Sorgente audio"
+msgstr ""
 
 #: assets/editor-sidebar.js:328
 msgid "Select audio from Media Library"
-msgstr "Seleziona audio dalla Libreria Media"
+msgstr ""
 
 #: assets/editor-sidebar.js:329
 msgid "Selected:"
-msgstr "Selezionato:"
+msgstr ""
 
 #: assets/editor-sidebar.js:329
 msgid "No audio selected"
-msgstr "Nessun audio selezionato"
+msgstr ""
 
 #: assets/editor-sidebar.js:333
 msgid "Editorial options"
-msgstr "Opzioni editoriali"
+msgstr ""
 
 #: assets/editor-sidebar.js:338
 msgid "Language"
-msgstr "Lingua"
+msgstr ""
 
 #: assets/editor-sidebar.js:341
 msgid "Use a BCP-47 locale (example: en-US, it-IT)."
@@ -136,19 +133,19 @@ msgstr ""
 
 #: assets/editor-sidebar.js:348
 msgid "Tone"
-msgstr "Tono"
+msgstr ""
 
 #: assets/editor-sidebar.js:351
 msgid "professional"
-msgstr "professionale"
+msgstr ""
 
 #: assets/editor-sidebar.js:352
 msgid "neutral"
-msgstr "neutro"
+msgstr ""
 
 #: assets/editor-sidebar.js:353
 msgid "conversational"
-msgstr "conversazionale"
+msgstr ""
 
 #: assets/editor-sidebar.js:355
 msgid "Defines the writing style used for the generated draft."
@@ -156,64 +153,53 @@ msgstr ""
 
 #: assets/editor-sidebar.js:363
 msgid "Target length"
-msgstr "Lunghezza target"
+msgstr ""
 
 #: assets/editor-sidebar.js:378
 msgid "Proper noun hints (comma or new line separated)"
-msgstr "Suggerimenti nomi propri (separati da virgola o nuova riga)"
+msgstr ""
 
 #: assets/editor-sidebar.js:381
-msgid ""
-"Use this field to protect names that must remain accurate (people, places, "
-"brands, products). Example: Marrakech, BMW GS."
+msgid "Use this field to protect names that must remain accurate (people, places, brands, products). Example: Marrakech, BMW GS."
 msgstr ""
 
 #: assets/editor-sidebar.js:389
 msgid "Editor insertion mode"
-msgstr "Modalita' inserimento editor"
+msgstr ""
 
 #: assets/editor-sidebar.js:392
 msgid "Append (recommended)"
-msgstr "Aggiungi (consigliato)"
+msgstr ""
 
 #: assets/editor-sidebar.js:393
 msgid "Replace"
-msgstr "Sostituisci"
+msgstr ""
 
 #: assets/editor-sidebar.js:395
-msgid ""
-"Append adds new blocks at the end. Replace overwrites current editor blocks."
+msgid "Append adds new blocks at the end. Replace overwrites current editor blocks."
 msgstr ""
 
 #: assets/editor-sidebar.js:402
 msgid "Generate"
-msgstr "Genera"
+msgstr ""
 
 #: assets/editor-sidebar.js:406
 msgid "Audio selected. Ready to generate."
-msgstr "Audio selezionato. Pronto per la generazione."
+msgstr ""
 
 #: assets/editor-sidebar.js:406
 msgid "Select an audio file to enable generation."
-msgstr "Seleziona un file audio per abilitare la generazione."
+msgstr ""
 
 #: assets/editor-sidebar.js:416
 msgid "Generating..."
-msgstr "Generazione in corso..."
+msgstr ""
 
 #: assets/editor-sidebar.js:416
 msgid "Generate draft from audio"
-msgstr "Genera bozza da audio"
+msgstr ""
 
-#: assets/editor-sidebar.js:427 assets/editor-sidebar.js:428
-msgid "Audio Converter"
-msgstr "Audio Converter"
-
-#~ msgid "short"
-#~ msgstr "breve"
-
-#~ msgid "medium"
-#~ msgstr "media"
-
-#~ msgid "long"
-#~ msgstr "lunga"
+#: assets/editor-sidebar.js:427
+#: assets/editor-sidebar.js:428
+msgid "Nomad Pipeline Audio to Draft"
+msgstr ""

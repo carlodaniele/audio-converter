@@ -2,21 +2,21 @@
 
 This directory stores localization files for the plugin text domain:
 
-- Text domain: `audio-converter`
-- POT template: `audio-converter.pot`
+- Text domain: `nomad-pipeline-audio-to-draft`
+- POT template: `nomad-pipeline-audio-to-draft.pot`
 
 ## Regenerate POT
 
 From the workspace root, run:
 
 ```bash
-wp i18n make-pot plugins/audio-converter plugins/audio-converter/languages/audio-converter.pot --slug=audio-converter
+wp i18n make-pot plugins/audio-converter plugins/audio-converter/languages/nomad-pipeline-audio-to-draft.pot --slug=nomad-pipeline-audio-to-draft
 ```
 
 ## Add a locale
 
-1. Create `audio-converter-<locale>.po` from the POT template (example: `audio-converter-it_IT.po`).
-2. Compile `.po` to `.mo` (example output: `audio-converter-it_IT.mo`).
+1. Create `nomad-pipeline-audio-to-draft-<locale>.po` from the POT template (example: `nomad-pipeline-audio-to-draft-it_IT.po`).
+2. Compile `.po` to `.mo` (example output: `nomad-pipeline-audio-to-draft-it_IT.mo`).
 3. Keep files in this directory.
 
 ## JavaScript translations

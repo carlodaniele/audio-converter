@@ -31,7 +31,7 @@ Create these files in local order:
 
 ### Screenshot 1 - Settings page
 
-Path: Settings > Audio Converter
+Path: Settings > Nomad Pipeline Audio to Draft
 
 Required visible elements:
 - Default language
@@ -52,7 +52,7 @@ Save as: screenshot-1.png
 Path: Posts > Add New (Block Editor)
 
 Required visible elements:
-- Audio Converter sidebar open
+- Nomad Pipeline Audio to Draft sidebar open
 - Selected audio file visible
 - Generate draft action visible
 - Editorial options visible with sane defaults

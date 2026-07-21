@@ -1,6 +1,6 @@
 <?php
 /**
- * Uninstall cleanup for Audio Converter.
+ * Uninstall cleanup for Nomad Pipeline Audio to Draft.
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {

@@ -11,9 +11,9 @@ final class Audio_Converter_AI_Processor {
 	private const SIGNED_URL_FETCH_TIMEOUT_SECONDS = 45;
 	private const SIGNED_URL_MAX_REDIRECTS = 2;
 	private const SIGNED_URL_MAX_RESPONSE_BYTES = 41943040;
-	private const FREE_DEFAULT_TEMPERATURE = 0.3;
-	private const MIN_TEMPERATURE          = 0.0;
-	private const MAX_TEMPERATURE          = 1.0;
+	private const DEFAULT_TEMPERATURE = 0.3;
+	private const MIN_TEMPERATURE     = 0.0;
+	private const MAX_TEMPERATURE     = 1.0;
 
 	private static function ai_error( string $code, string $message ) {
 		return Audio_Converter_Ability_Contract::error_response( $code, $message );
@@ -468,10 +468,6 @@ final class Audio_Converter_AI_Processor {
 		return $structured;
 	}
 
-	private static function is_pro_temperature_enabled(): bool {
-		return (bool) apply_filters( 'audio_converter_pro_temperature_enabled', false );
-	}
-
 	private static function clamp_temperature( float $value ): float {
 		if ( $value < self::MIN_TEMPERATURE ) {
 			return self::MIN_TEMPERATURE;
@@ -485,11 +481,7 @@ final class Audio_Converter_AI_Processor {
 	}
 
 	private static function generation_temperature( array $payload ): float {
-		$default = (float) self::FREE_DEFAULT_TEMPERATURE;
-
-		if ( ! self::is_pro_temperature_enabled() ) {
-			return $default;
-		}
+		$default = (float) self::DEFAULT_TEMPERATURE;
 
 		$requested = $default;
 		if ( isset( $payload['editorial_options']['temperature'] ) && is_numeric( $payload['editorial_options']['temperature'] ) ) {
@@ -500,13 +492,10 @@ final class Audio_Converter_AI_Processor {
 	}
 
 	private static function temperature_observability_context( array $payload, float $effective ): array {
-		$pro_enabled   = self::is_pro_temperature_enabled();
 		$has_requested = isset( $payload['editorial_options']['temperature'] ) && is_numeric( $payload['editorial_options']['temperature'] );
-		$requested     = $has_requested ? (float) $payload['editorial_options']['temperature'] : (float) self::FREE_DEFAULT_TEMPERATURE;
+		$requested     = $has_requested ? (float) $payload['editorial_options']['temperature'] : (float) self::DEFAULT_TEMPERATURE;
 
 		return array(
-			'mode'              => $pro_enabled ? 'extended' : 'standard',
-			'pro_enabled'       => $pro_enabled,
 			'has_requested'     => $has_requested,
 			'requested'         => $requested,
 			'effective'         => $effective,

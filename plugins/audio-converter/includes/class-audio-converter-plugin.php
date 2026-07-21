@@ -5,8 +5,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 final class Audio_Converter_Plugin {
-	const ABILITY_NAME                    = 'audio-converter/audio-to-post';
-	const ABILITY_RUN_PATH                = '/wp-abilities/v1/abilities/audio-converter/audio-to-post/run';
+	const ABILITY_NAME                    = 'nomad-pipeline-audio-to-draft/audio-to-post';
+	const ABILITY_RUN_PATH                = '/wp-abilities/v1/abilities/nomad-pipeline-audio-to-draft/audio-to-post/run';
 	const OPTION_KEY                      = 'aicb_settings';
 
 	public static function init(): void {
@@ -20,11 +20,11 @@ final class Audio_Converter_Plugin {
 	}
 
 	public static function plugin_action_links( array $links ): array {
-		$settings_url = admin_url( 'options-general.php?page=audio-converter' );
+		$settings_url = admin_url( 'options-general.php?page=nomad-pipeline-audio-to-draft' );
 		$settings_link = sprintf(
 			'<a href="%1$s">%2$s</a>',
 			esc_url( $settings_url ),
-			esc_html__( 'Settings', 'audio-converter' )
+			esc_html__( 'Settings', 'nomad-pipeline-audio-to-draft' )
 		);
 
 		array_unshift( $links, $settings_link );
@@ -357,7 +357,7 @@ final class Audio_Converter_Plugin {
 			$language = $defaults['default_language'];
 		}
 
-		// Free version keeps a fixed default temperature.
+		// Keep a sanitized default temperature value in stored settings.
 		$temperature = $defaults['default_temperature'];
 
 		return array(
@@ -373,10 +373,10 @@ final class Audio_Converter_Plugin {
 
 	public static function register_admin_menu(): void {
 		add_options_page(
-			'Audio Converter',
-			'Audio Converter',
+			'Nomad Pipeline Audio to Draft',
+			'Nomad Pipeline Audio to Draft',
 			'manage_options',
-			'audio-converter',
+			'nomad-pipeline-audio-to-draft',
 			array( __CLASS__, 'render_settings_page' )
 		);
 	}
@@ -404,7 +404,7 @@ final class Audio_Converter_Plugin {
 		$refresh_url                = wp_nonce_url(
 			add_query_arg(
 				array(
-					'page'                   => 'audio-converter',
+					'page'                   => 'nomad-pipeline-audio-to-draft',
 					'aicb_refresh_languages' => '1',
 				),
 				admin_url( 'options-general.php' )
@@ -413,7 +413,7 @@ final class Audio_Converter_Plugin {
 		);
 		?>
 		<div class="wrap">
-			<h1>Audio Converter</h1>
+			<h1>Nomad Pipeline Audio to Draft</h1>
 			<p>Configure default editorial values used by the Gutenberg sidebar.</p>
 			<?php if ( $did_refresh ) : ?>
 				<div class="notice notice-success is-dismissible"><p>Language catalog refreshed.</p></div>
@@ -511,7 +511,7 @@ final class Audio_Converter_Plugin {
 		);
 
 		if ( function_exists( 'wp_set_script_translations' ) ) {
-			wp_set_script_translations( 'audio-converter-editor-sidebar', 'audio-converter' );
+			wp_set_script_translations( 'audio-converter-editor-sidebar', 'nomad-pipeline-audio-to-draft' );
 		}
 
 		$settings = self::get_settings();
@@ -532,7 +532,7 @@ final class Audio_Converter_Plugin {
 	}
 
 	public static function enqueue_admin_assets( string $hook ): void {
-		if ( 'settings_page_audio-converter' !== $hook ) {
+		if ( 'settings_page_nomad-pipeline-audio-to-draft' !== $hook ) {
 			return;
 		}
 

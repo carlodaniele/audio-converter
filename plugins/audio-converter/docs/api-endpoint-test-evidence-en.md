@@ -4,7 +4,7 @@ This document records manual validation evidence for the canonical Abilities API
 
 ## Endpoint under test
 
-- POST /wp-json/wp-abilities/v1/abilities/audio-converter/audio-to-post/run
+- POST /wp-json/wp-abilities/v1/abilities/nomad-pipeline-audio-to-draft/audio-to-post/run
 
 ## Test run date
 
@@ -113,7 +113,7 @@ This document records manual validation evidence for the canonical Abilities API
 ```json
 {
   "code": "ability_invalid_input",
-  "message": "Ability \"audio-converter/audio-to-post\" has invalid input. Reason: source is a required property of input.",
+  "message": "Ability \"nomad-pipeline-audio-to-draft/audio-to-post\" has invalid input. Reason: source is a required property of input.",
   "data": {
     "status": 400
   }

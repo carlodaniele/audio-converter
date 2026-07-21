@@ -1,6 +1,6 @@
-# Audio Converter
+# Nomad Pipeline Audio to Draft
 
-Audio Converter generates a structured post draft from an audio file directly inside the WordPress block editor.
+Nomad Pipeline Audio to Draft generates a structured post draft from an audio file directly inside the WordPress block editor.
 
 ## Free version scope
 
@@ -28,11 +28,9 @@ Audio Converter generates a structured post draft from an audio file directly in
 - `docs/free-faq-fr.md`
 - `docs/free-user-guide-pl.md`
 - `docs/free-faq-pl.md`
-- `docs/wporg-screenshots-checklist-en.md`
 - `docs/wporg-screenshot-capture-runbook-en.md`
 - `docs/wporg-visual-assets-runbook-en.md`
 - `docs/wporg-release-readiness-en.md`
-- `docs/wporg-submission-handoff-en.md`
 - `docs/api-endpoint-test-evidence-en.md`
 - `docs/uninstall-data-cleanup-runbook-en.md`
 - `docs/retry-fault-injection-runbook-en.md`
@@ -60,13 +58,13 @@ Important: without an active AI connector, the plugin can be activated but canno
 
 1. In WordPress Admin, go to Plugins > Add New and either upload the plugin ZIP (Upload Plugin) or search for the plugin in the directory.
 2. Activate the plugin from Plugins.
-3. Open Settings > Audio Converter.
+3. Open Settings > Nomad Pipeline Audio to Draft.
 4. Save default editorial values.
 
 ## Usage in Gutenberg
 
 1. Open or create a post.
-2. Open the Audio Converter sidebar.
+2. Open the Nomad Pipeline Audio to Draft sidebar.
 3. Select an audio file from Media Library.
 4. Configure editorial options.
 5. Click Generate draft from audio.
@@ -75,7 +73,7 @@ The plugin inserts generated Gutenberg blocks into the current post.
 
 ## API endpoint
 
-- Canonical (Abilities API): `/wp-json/wp-abilities/v1/abilities/audio-converter/audio-to-post/run`
+- Canonical (Abilities API): `/wp-json/wp-abilities/v1/abilities/nomad-pipeline-audio-to-draft/audio-to-post/run`
 
 ## API endpoint tests (completed)
 
@@ -97,5 +95,5 @@ Recommended script for retry fault-injection validation:
 
 ## i18n
 
-- Text domain: `audio-converter`
-- POT file: `languages/audio-converter.pot`
+- Text domain: `nomad-pipeline-audio-to-draft`
+- POT file: `languages/nomad-pipeline-audio-to-draft.pot`

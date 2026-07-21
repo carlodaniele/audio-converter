@@ -32,7 +32,7 @@ Optional:
 
 - Do not include fake customer logos, private brands, or provider names.
 - Do not show API keys, tokens, URLs, or account identifiers.
-- Keep plugin name readable: Audio Converter.
+- Keep plugin name readable: Nomad Pipeline Audio to Draft.
 - Keep text minimal on icon variants.
 - Ensure contrast remains readable on both light and dark wp.org backgrounds.
 

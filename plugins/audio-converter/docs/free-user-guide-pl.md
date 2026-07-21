@@ -14,8 +14,8 @@ Wazne: bez aktywnego konektora AI wtyczka moze byc aktywna, ale nie wygeneruje s
 ## 1) Instalacja
 
 1. Skopiuj folder wtyczki do wp-content/plugins.
-2. Aktywuj Audio Converter.
-3. Przejdz do Ustawienia > Audio Converter.
+2. Aktywuj Nomad Pipeline Audio to Draft.
+3. Przejdz do Ustawienia > Nomad Pipeline Audio to Draft.
 4. Zapisz ustawienia domyslne.
 
 ## 2) Zalecana konfiguracja
@@ -29,7 +29,7 @@ Wazne: bez aktywnego konektora AI wtyczka moze byc aktywna, ale nie wygeneruje s
 ## 3) Uzycie w edytorze blokowym
 
 1. Otworz lub utworz wpis.
-2. Otworz panel boczny Audio Converter.
+2. Otworz panel boczny Nomad Pipeline Audio to Draft.
 3. Kliknij Select audio from Media Library.
 4. Wybierz plik audio.
 5. Sprawdz opcje redakcyjne.
