@@ -10,7 +10,7 @@ This directory stores localization files for the plugin text domain:
 From the workspace root, run:
 
 ```bash
-wp i18n make-pot plugins/audio-converter plugins/audio-converter/languages/nomad-pipeline-audio-to-draft.pot --slug=nomad-pipeline-audio-to-draft
+wp i18n make-pot plugins/nomad-pipeline-audio-to-draft plugins/nomad-pipeline-audio-to-draft/languages/nomad-pipeline-audio-to-draft.pot --slug=nomad-pipeline-audio-to-draft
 ```
 
 ## Add a locale

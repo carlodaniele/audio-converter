@@ -3,7 +3,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Nomad Pipeline Audio to Draft 0.1.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/audio-converter\n"
+"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/nomad-pipeline-audio-to-draft\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -12,20 +12,20 @@ msgstr ""
 "POT-Creation-Date: 2026-07-07T16:21:07+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.12.0\n"
-"X-Domain: audio-converter\n"
+"X-Domain: nomad-pipeline-audio-to-draft\n"
 
 #. Plugin Name of the plugin
-#: audio-converter.php
+#: nomad-pipeline-audio-to-draft.php
 msgid "Nomad Pipeline Audio to Draft"
 msgstr ""
 
 #. Description of the plugin
-#: audio-converter.php
+#: nomad-pipeline-audio-to-draft.php
 msgid "Generate post drafts from audio in the WordPress block editor using WordPress AI connectors."
 msgstr ""
 
 #. Author of the plugin
-#: audio-converter.php
+#: nomad-pipeline-audio-to-draft.php
 msgid "Nomad Pipeline Audio to Draft Team"
 msgstr ""
 

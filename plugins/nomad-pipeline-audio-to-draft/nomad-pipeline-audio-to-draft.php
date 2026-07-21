@@ -24,7 +24,7 @@ require_once __DIR__ . '/includes/class-block-mapper.php';
 require_once __DIR__ . '/includes/class-publisher.php';
 require_once __DIR__ . '/includes/class-observability.php';
 require_once __DIR__ . '/includes/class-rest-controller.php';
-require_once __DIR__ . '/includes/class-audio-converter-plugin.php';
+require_once __DIR__ . '/includes/class-nomad-pipeline-audio-to-draft-plugin.php';
 
 register_activation_hook( __FILE__, array( 'Audio_Converter_Job_Store', 'install' ) );
 

@@ -2,11 +2,11 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
-PLUGIN_DIR="$ROOT_DIR/plugins/audio-converter"
+PLUGIN_DIR="$ROOT_DIR/plugins/nomad-pipeline-audio-to-draft"
 
 required_files=(
-  "$PLUGIN_DIR/audio-converter.php"
-  "$PLUGIN_DIR/includes/class-audio-converter-plugin.php"
+  "$PLUGIN_DIR/nomad-pipeline-audio-to-draft.php"
+  "$PLUGIN_DIR/includes/class-nomad-pipeline-audio-to-draft-plugin.php"
   "$PLUGIN_DIR/includes/class-rest-controller.php"
   "$PLUGIN_DIR/includes/class-ability-contract.php"
   "$PLUGIN_DIR/includes/class-job-store.php"
@@ -48,7 +48,7 @@ SUMMARY_FILE="$ROOT_DIR/reports/phase3/skeleton-summary.md"
   echo "# Phase 3 Skeleton Summary"
   echo
   echo "Date: $(date '+%Y-%m-%d %H:%M:%S')"
-  echo "Plugin: audio-converter"
+  echo "Plugin: nomad-pipeline-audio-to-draft"
   echo
   echo "## Files"
   for f in "${required_files[@]}"; do

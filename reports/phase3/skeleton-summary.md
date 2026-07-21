@@ -1,17 +1,17 @@
 # Phase 3 Skeleton Summary
 
-Date: 2026-07-21 13:31:00
-Plugin: audio-converter
+Date: 2026-07-21 14:55:07
+Plugin: nomad-pipeline-audio-to-draft
 
 ## Files
-- plugins/audio-converter/audio-converter.php
-- plugins/audio-converter/includes/class-audio-converter-plugin.php
-- plugins/audio-converter/includes/class-rest-controller.php
-- plugins/audio-converter/includes/class-ability-contract.php
-- plugins/audio-converter/includes/class-job-store.php
-- plugins/audio-converter/includes/class-idempotency-lock.php
-- plugins/audio-converter/includes/class-ai-processor.php
-- plugins/audio-converter/includes/class-normalizer.php
-- plugins/audio-converter/includes/class-block-mapper.php
-- plugins/audio-converter/includes/class-publisher.php
-- plugins/audio-converter/includes/class-observability.php
+- plugins/nomad-pipeline-audio-to-draft/nomad-pipeline-audio-to-draft.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-nomad-pipeline-audio-to-draft-plugin.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-rest-controller.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-ability-contract.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-job-store.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-idempotency-lock.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-ai-processor.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-normalizer.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-block-mapper.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-publisher.php
+- plugins/nomad-pipeline-audio-to-draft/includes/class-observability.php

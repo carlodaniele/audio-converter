@@ -16,7 +16,7 @@ final class Audio_Converter_Plugin {
 		add_action( 'admin_menu', array( __CLASS__, 'register_admin_menu' ) );
 		add_action( 'admin_enqueue_scripts', array( __CLASS__, 'enqueue_admin_assets' ) );
 		add_action( 'enqueue_block_editor_assets', array( __CLASS__, 'enqueue_editor_assets' ) );
-		add_filter( 'plugin_action_links_audio-converter/audio-converter.php', array( __CLASS__, 'plugin_action_links' ) );
+		add_filter( 'plugin_action_links_nomad-pipeline-audio-to-draft/nomad-pipeline-audio-to-draft.php', array( __CLASS__, 'plugin_action_links' ) );
 	}
 
 	public static function plugin_action_links( array $links ): array {
@@ -374,7 +374,7 @@ final class Audio_Converter_Plugin {
 	public static function register_admin_menu(): void {
 		add_options_page(
 			'Nomad Pipeline Audio to Draft',
-			'Nomad Pipeline Audio to Draft',
+			'Audio to Draft',
 			'manage_options',
 			'nomad-pipeline-audio-to-draft',
 			array( __CLASS__, 'render_settings_page' )

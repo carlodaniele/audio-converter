@@ -9,7 +9,7 @@ if [[ -z "${WP_BASE_URL:-}" ]]; then
   exit 1
 fi
 
-ENDPOINT="${WP_BASE_URL%/}/wp-json/wp-abilities/v1/abilities/audio-converter/audio-to-post/run"
+ENDPOINT="${WP_BASE_URL%/}/wp-json/wp-abilities/v1/abilities/nomad-pipeline-audio-to-draft/audio-to-post/run"
 RUN_TS="$(date +%s)"
 FAILURES=0
 

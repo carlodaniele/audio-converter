@@ -4,7 +4,7 @@ This adapter integrates the core logic into WordPress.
 
 Current implementation lives in:
 
-- plugins/audio-converter/
+- plugins/nomad-pipeline-audio-to-draft/
 
 Responsibilities:
 
